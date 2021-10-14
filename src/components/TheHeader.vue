@@ -1,15 +1,25 @@
 <template>
   <div>
-    <menu-icon></menu-icon>
+    <v-app-bar app>
+      <v-app-bar-nav-icon @click="clickDrawer"></v-app-bar-nav-icon>
+      <v-toolbar-title>Übersicht</v-toolbar-title>
+    </v-app-bar>
   </div>
 </template>
 
 <script>
-import MenuIcon from "@/components/MenuIcon";
-
 export default {
   name: "TheHeader",
-  components: {MenuIcon}
+  data() {
+    return {
+
+    }
+  },
+  methods: {
+    clickDrawer() {
+      this.$store.dispatch("setDrawer");
+    }
+  }
 }
 </script>
 

@@ -1,8 +1,10 @@
-import Vue from 'vue'
+import Vue from "vue";
 import VueRouter from 'vue-router'
-import OverviewPage from "@/components/OverviewPage";
 
 Vue.use(VueRouter)
+
+import OverviewPage from "@/components/OverviewPage";
+
 
 const routes = [
   {
@@ -11,10 +13,9 @@ const routes = [
   }
 ]
 
-const router = new VueRouter({
+
+export const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   routes
 })
-
-export default router

@@ -1,41 +1,19 @@
 <template>
-  <div id="nav">
-    <router-view></router-view>
-  </div>
+  <v-app id="inspire">
+    <navigation-drawer></navigation-drawer>
+    <v-main>
+      <router-view/>
+    </v-main>
+  </v-app>
 </template>
 
 <script>
+import NavigationDrawer from "@/components/NavigationDrawer";
 
 export default {
-  name: "App"
+  name: 'App',
+  components: {
+    NavigationDrawer
+  }
 }
-
 </script>
-
-<style>
-body {
-  padding: 0;
-  margin: 0;
-}
-
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-}
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
-</style>
