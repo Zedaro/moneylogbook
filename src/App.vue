@@ -1,6 +1,7 @@
 <template>
   <v-app id="inspire">
     <navigation-drawer></navigation-drawer>
+    <the-header></the-header>
     <v-main>
       <router-view/>
     </v-main>
@@ -9,11 +10,14 @@
 
 <script>
 import NavigationDrawer from "@/components/NavigationDrawer";
+import TheHeader from "@/components/TheHeader";
+
 
 export default {
   name: 'App',
   components: {
-    NavigationDrawer
+    NavigationDrawer,
+    TheHeader
   }
 }
 </script>

@@ -1,5 +1,10 @@
+
+
+
+//<editor-fold desc="Import Statements">
 import Vue from 'vue'
 import App from './App.vue'
+//</editor-fold>
 
 
 
@@ -22,13 +27,7 @@ Vue.use(IconsPlugin)
 
 
 //<editor-fold desc="Global Components">
-import TheMenu from "@/components/TheMenu";
-import TheFooter from "@/components/TheFooter";
-import TheHeader from "@/components/TheHeader";
 
-Vue.component("TheMenu", TheMenu)
-Vue.component("TheFooter", TheFooter)
-Vue.component("TheHeader", TheHeader)
 //</editor-fold>
 
 
