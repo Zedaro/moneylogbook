@@ -6,8 +6,8 @@ Vue.use(VueRouter)
 import OverviewPage from "@/components/OverviewPage";
 import TransactionsPage from "@/components/TransactionsPage";
 import RepeatingTransactionsPage from "@/components/RepeatingTransactionsPage";
-import MoneyAccountsPage from "@/components/MoneyAccountsPage";
-import NewMoneyAccount from "@/components/MoneyAccountDetails";
+import MoneyAccountsPage from "@/components/moneyAccounts/page/MoneyAccountsPage";
+import MoneyAccountForm from "@/components/moneyAccounts/form/MoneyAccountForm";
 
 
 const routes = [
@@ -50,8 +50,8 @@ const routes = [
 
   {
     path: '/moneyAccounts/:item',
-    name: 'moneyAccountItem',
-    component: NewMoneyAccount
+    name: 'moneyAccountForm',
+    component: MoneyAccountForm
   },
   {
     path: '/:primaryPage/:detailsPage',

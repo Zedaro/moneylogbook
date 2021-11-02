@@ -13,34 +13,34 @@
         </v-list-item>
 
         <!--
-        <v-list-item :to="{name: 'overview'}" three-line @click="clickDrawer">
-          <v-list-item-content>
-            <v-list-item-title class="text-h6">Übersicht</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+        <v-page-item :to="{name: 'overview'}" three-line @click="clickDrawer">
+          <v-page-item-content>
+            <v-page-item-title class="text-h6">Übersicht</v-page-item-title>
+          </v-page-item-content>
+        </v-page-item>
 
 
 
-        <v-list-item :to="{name: 'transactions'}" three-line @click="clickDrawer">
-          <v-list-item-content>
-            <v-list-item-title class="text-h6">Transaktionen</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+        <v-page-item :to="{name: 'transactions'}" three-line @click="clickDrawer">
+          <v-page-item-content>
+            <v-page-item-title class="text-h6">Transaktionen</v-page-item-title>
+          </v-page-item-content>
+        </v-page-item>
 
 
 
-        <v-list-item :to="{name: 'repeatingTransactions'}" three-line @click="clickDrawer">
-          <v-list-item-content>
-            <v-list-item-title class="text-h6">Daueraufträge</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+        <v-page-item :to="{name: 'repeatingTransactions'}" three-line @click="clickDrawer">
+          <v-page-item-content>
+            <v-page-item-title class="text-h6">Daueraufträge</v-page-item-title>
+          </v-page-item-content>
+        </v-page-item>
 
 
-        <v-list-item :to="{name: 'moneyAccounts'}" three-line @click="clickDrawer">
-          <v-list-item-content>
-            <v-list-item-title class="text-h6">Konten</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+        <v-page-item :to="{name: 'moneyAccounts'}" three-line @click="clickDrawer">
+          <v-page-item-content>
+            <v-page-item-title class="text-h6">Konten</v-page-item-title>
+          </v-page-item-content>
+        </v-page-item>
         -->
 
       </v-list-item-group>
