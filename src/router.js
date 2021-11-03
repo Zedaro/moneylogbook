@@ -1,5 +1,6 @@
 import Vue from "vue";
-import VueRouter from 'vue-router'
+import VueRouter from 'vue-router';
+import {store} from "@/store/store";
 
 Vue.use(VueRouter)
 
@@ -13,7 +14,7 @@ import MoneyAccountForm from "@/components/moneyAccounts/form/MoneyAccountForm";
 const routes = [
   {
     path: '/',
-    redirect: '/uebersicht'
+    redirect: { name: 'overview' }
   },
   {
     path: '/overview',
@@ -51,7 +52,17 @@ const routes = [
   {
     path: '/moneyAccounts/:item',
     name: 'moneyAccountForm',
-    component: MoneyAccountForm
+    component: MoneyAccountForm,
+    /*
+    beforeEnter: (to) =>  {
+      if(to.params.item == 'new') {
+        this.$store.dispatch('setTitle', 'Neues Konto');
+      }
+      else {
+        this.$store.dispatch('setTitle', 'Konto bearbeiten');
+      }
+    }
+    */
   },
   {
     path: '/:primaryPage/:detailsPage',
@@ -61,5 +72,24 @@ const routes = [
 export const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
-  routes
-})
+  routes,
+});
+
+router.afterEach( (to) => {
+  const name = to.name;
+
+  if(name === 'overview')
+    store.dispatch('setTitle', 'Übersicht');
+  else if(name === 'transactions')
+    store.dispatch('setTitle', 'Transaktionen');
+  else if(name === 'repeatingTransactions')
+    store.dispatch('setTitle', 'Daueraufträge');
+  else if(name === 'moneyAccounts')
+    store.dispatch('setTitle', 'Konten');
+  else if(name === 'moneyAccountForm') {
+    if(to.params.item === 'new')
+      store.dispatch('setTitle', 'Neues Konto');
+    else
+      store.dispatch('setTitle', 'Konto bearbeiten');
+  }
+} );

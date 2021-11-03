@@ -6,42 +6,11 @@
     <v-list>
       <v-list-item-group>
 
-        <v-list-item v-for="(item, index) in listItems" :key="index" :to="{name: item.pathName}" three-line @click="clickDrawer">
+        <v-list-item v-for="(item, index) in this.$store.getters.getDrawerListItems" :key="index" :to="{name: item.pathName}" three-line @click="clickDrawer">
           <v-list-item-content>
             <v-list-item-title class="text-h6">{{ item.title }}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-
-        <!--
-        <v-page-item :to="{name: 'overview'}" three-line @click="clickDrawer">
-          <v-page-item-content>
-            <v-page-item-title class="text-h6">Übersicht</v-page-item-title>
-          </v-page-item-content>
-        </v-page-item>
-
-
-
-        <v-page-item :to="{name: 'transactions'}" three-line @click="clickDrawer">
-          <v-page-item-content>
-            <v-page-item-title class="text-h6">Transaktionen</v-page-item-title>
-          </v-page-item-content>
-        </v-page-item>
-
-
-
-        <v-page-item :to="{name: 'repeatingTransactions'}" three-line @click="clickDrawer">
-          <v-page-item-content>
-            <v-page-item-title class="text-h6">Daueraufträge</v-page-item-title>
-          </v-page-item-content>
-        </v-page-item>
-
-
-        <v-page-item :to="{name: 'moneyAccounts'}" three-line @click="clickDrawer">
-          <v-page-item-content>
-            <v-page-item-title class="text-h6">Konten</v-page-item-title>
-          </v-page-item-content>
-        </v-page-item>
-        -->
 
       </v-list-item-group>
     </v-list>
@@ -52,28 +21,6 @@
 <script>
 export default {
   name: "NavigationDrawer",
-  data() {
-    return {
-      listItems: [
-        {
-          pathName: 'overview',
-          title: 'Übersicht'
-        },
-        {
-          pathName: 'transactions',
-          title: 'Transaktionen'
-        },
-        {
-          pathName: 'repeatingTransactions',
-          title: 'Daueraufträge'
-        },
-        {
-          pathName: 'moneyAccounts',
-          title: 'Konten'
-        },
-      ]
-    };
-  },
   computed: {
     drawer() {
       return this.$store.getters.getDrawer;
@@ -84,6 +31,7 @@ export default {
   },
   methods: {
     clickDrawer() {
+      //this.$store.dispatch("setDrawer");
       this.$store.dispatch("setDrawer");
     }
   }

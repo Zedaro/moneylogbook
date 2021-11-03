@@ -8,9 +8,7 @@ import App from './App.vue'
 
 
 
-//<editor-fold desc="Router">
-import {router} from "./router";
-//</editor-fold>
+
 
 
 
@@ -35,7 +33,9 @@ Vue.use(IconsPlugin)
 //Store
 import {store} from "@/store/store";
 
-
+//<editor-fold desc="Router">
+import {router} from "./router";
+//</editor-fold>
 
 //Vuetify
 import vuetify from './plugins/vuetify'
@@ -50,8 +50,20 @@ Vue.config.productionTip = false
 //Vue App erstellen und rendern
 new Vue({
   el: "#app",
-  router,
   store,
+  router,
   vuetify,
+    /*
+  created: function() {
+    this.$store.dispatch('setState')
+        .then( () => {
+            console.log("After setState:");
+            console.log(this.$store.getters.getState);
+        }) ;
+  },
+  */
+  created: function() {
+    console.log(this.$store.getters.getState);
+  },
   render: h => h(App)
 })
