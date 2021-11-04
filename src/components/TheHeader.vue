@@ -3,9 +3,9 @@
     <v-app-bar-nav-icon v-if="Object.keys($route.params).length === 0" @click="clickDrawer"></v-app-bar-nav-icon>
     <v-app-bar-nav-icon v-else @click="$router.back()">
       <v-icon>mdi-arrow-left</v-icon></v-app-bar-nav-icon>
-    <v-toolbar-title>{{ this.$store.getters.getToolbarTitle }}</v-toolbar-title>
+    <v-toolbar-title>{{ toolbarTitle }}</v-toolbar-title>
     <!-- <button @click="test">Test</button> -->
-    <button id="newLocalStorageButton" @click="newLocalStorage">New localStorage</button>
+    <button class="newLocalStorageButton" @click="newLocalStorage">new localStorage</button>
   </v-app-bar>
 </template>
 
@@ -15,6 +15,17 @@ export default {
   data() {
     return {
 
+    }
+  },
+  computed: {
+    toolbarTitle() {
+      if(this.$route.meta.title) {
+        return this.$route.meta.title;
+      }
+      else if(this.$route.params.item === 'new')
+        return 'Neues Konto';
+      else
+        return 'Konto bearbeiten';
     }
   },
   methods: {
@@ -31,12 +42,12 @@ export default {
         moneyAccounts: [
           {
             name: 'Sparkasse',
-            money: 1000,
+            money: '1000',
             color: "#EA0A8E"
           },
           {
             name: 'ING DiBa',
-            money: 2000,
+            money: '2000',
             color: "#FF6600"
           }
         ]
@@ -50,7 +61,7 @@ export default {
 
 <style scoped>
 
-  #newLocalStorageButton {
+  .newLocalStorageButton {
     border: solid black 1px;
     margin-left: 10px;
   }

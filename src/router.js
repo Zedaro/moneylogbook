@@ -1,6 +1,6 @@
 import Vue from "vue";
 import VueRouter from 'vue-router';
-import {store} from "@/store/store";
+//import {store} from "@/store/store";
 
 Vue.use(VueRouter)
 
@@ -19,22 +19,26 @@ const routes = [
   {
     path: '/overview',
     name: 'overview',
-    component: OverviewPage
+    component: OverviewPage,
+    meta: { title: 'Übersicht' }
   },
   {
     path: '/transactions',
     name: 'transactions',
-    component: TransactionsPage
+    component: TransactionsPage,
+    meta: { title: 'Transaktionen' }
   },
   {
     path: '/repeatingTransactions',
     name: 'repeatingTransactions',
-    component: RepeatingTransactionsPage
+    component: RepeatingTransactionsPage,
+    meta: { title: 'Daueraufträge' }
   },
   {
     path: '/moneyAccounts',
     name: "moneyAccounts",
-    component: MoneyAccountsPage
+    component: MoneyAccountsPage,
+    meta: { title: 'Konten' }
   },
     /*
   {
@@ -75,6 +79,7 @@ export const router = new VueRouter({
   routes,
 });
 
+/*
 router.afterEach( (to) => {
   const name = to.name;
 
@@ -93,3 +98,5 @@ router.afterEach( (to) => {
       store.dispatch('setTitle', 'Konto bearbeiten');
   }
 } );
+
+ */

@@ -7,25 +7,8 @@ Vue.use(Vuex)
 export const store = new Vuex.Store({
     state: {
         drawer: false,
-        localStorage: JSON.parse(localStorage.getItem('state')),
-        drawerListItems: [
-            {
-                pathName: 'overview',
-                title: 'Übersicht'
-            },
-            {
-                pathName: 'transactions',
-                title: 'Transaktionen'
-            },
-            {
-                pathName: 'repeatingTransactions',
-                title: 'Daueraufträge'
-            },
-            {
-                pathName: 'moneyAccounts',
-                title: 'Konten'
-            },
-        ]
+        localStorage: null,
+
     },
 
         /*
@@ -67,6 +50,9 @@ export const store = new Vuex.Store({
         }
     },
     actions: {
+        setLocalStorage(context) {
+          context.commit('setLocalStorage');
+        },
         setState(context) {
             context.commit('setState');
         },
@@ -77,10 +63,10 @@ export const store = new Vuex.Store({
           context.commit('setTitle', title);
         },
         saveMoneyAccount(context, data) {
-            if(data.item !== 'new') {
-                context.commit('saveEditedMoneyAccount', data);
-            } else {
+            if(data.item === 'new') {
                 context.commit('saveNewMoneyAccount', data);
+            } else {
+                context.commit('saveEditedMoneyAccount', data);
             }
         },
         deleteMoneyAccount(context, data) {
@@ -96,6 +82,24 @@ export const store = new Vuex.Store({
             state.moneyAccounts = JSON.parse(localStorage.getItem('state')).moneyAccounts;
         },
         */
+        setLocalStorage(state) {
+            state.localStorage = localStorage.getItem('state') ? JSON.parse(localStorage.getItem('state')) : {
+                drawer: false,
+                toolbarTitle: 'Übersicht',
+                moneyAccounts: [
+                    {
+                        name: 'Sparkasse',
+                        money: '1000',
+                        color: "#EA0A8E"
+                    },
+                    {
+                        name: 'ING DiBa',
+                        money: '2000',
+                        color: "#FF6600"
+                    }
+                ]
+            };
+        },
         setDrawer(state) {
             state.drawer = !state.drawer;
         },
