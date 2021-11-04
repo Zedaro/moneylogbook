@@ -5,7 +5,7 @@
       <v-icon>mdi-arrow-left</v-icon></v-app-bar-nav-icon>
     <v-toolbar-title>{{ toolbarTitle }}</v-toolbar-title>
     <!-- <button @click="test">Test</button> -->
-    <button class="newLocalStorageButton" @click="newLocalStorage">new localStorage</button>
+    <button class="newLocalStorageButton" @click="newLocalStorage">Reset localStorage</button>
   </v-app-bar>
 </template>
 
