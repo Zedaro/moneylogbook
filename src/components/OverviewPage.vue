@@ -1,19 +1,34 @@
 <template>
   <div>
-    Übersicht
-    <button @click="test">Test</button>
+    <doughnut-chart></doughnut-chart>
+    <v-card width="50%">
+      <v-card-title id="card-title">Gesamt</v-card-title>
+      <v-card-text class="text-center">{{ totalMoney }}</v-card-text>
+    </v-card>
+    <money-accounts-list></money-accounts-list>
+    <plus-minus></plus-minus>
+    <!-- <button @click="test">Test</button> -->
     <!-- <button id="newLocalStorageButton" @click="newLocalStorage">New localStorage</button> -->
   </div>
 
 </template>
 
 <script>
+import DoughnutChart from "@/components/chart/DoughnutChart";
+import MoneyAccountsList from "@/components/moneyAccounts/page/MoneyAccountsList";
+import PlusMinus from "@/components/moneyAccounts/buttons/PlusMinus";
 export default {
   name: "OverviewPage",
+  components: { DoughnutChart, MoneyAccountsList, PlusMinus },
+  computed: {
+    totalMoney() {
+        return this.$store.getters.getTotalMoney;
+      //this.money.replace(/\./g, ',') €
+    }
+  },
   methods: {
     test() {
-      var myStorage = window.localStorage;
-      console.log(myStorage);
+
     },
     newLocalStorage() {
       localStorage.clear();
@@ -40,5 +55,14 @@ export default {
 </script>
 
 <style scoped>
+
+  .v-card {
+    margin: auto;
+    background-color: #9fc788;
+  }
+
+  .v-card__title {
+    justify-content: center;
+  }
 
 </style>

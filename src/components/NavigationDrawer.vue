@@ -36,10 +36,12 @@ export default {
           pathName: 'repeatingTransactions',
           title: 'Daueraufträge'
         },
+          /*
         {
           pathName: 'moneyAccounts',
           title: 'Konten'
         },
+        */
       ]
     };
   },

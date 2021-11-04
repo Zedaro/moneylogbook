@@ -37,21 +37,22 @@ export default {
     },
     newLocalStorage() {
       localStorage.clear();
-      const state = {
+      let state = {
         toolbarTitle: 'Übersicht',
         moneyAccounts: [
           {
             name: 'Sparkasse',
-            money: '1000',
+            money: 1000,
             color: "#EA0A8E"
           },
           {
             name: 'ING DiBa',
-            money: '2000',
+            money: 2000,
             color: "#FF6600"
           }
         ]
       };
+      state.totalMoney = state.moneyAccounts[0].money + state.moneyAccounts[1].money;
       localStorage.setItem('state', JSON.stringify(state));
       window.location.reload();
     }

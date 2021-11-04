@@ -47,6 +47,9 @@ export const store = new Vuex.Store({
         },
         getMoneyAccounts(state) {
             return state.localStorage.moneyAccounts;
+        },
+        getTotalMoney(state) {
+            return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(state.localStorage.totalMoney);
         }
     },
     actions: {
@@ -71,6 +74,12 @@ export const store = new Vuex.Store({
         },
         deleteMoneyAccount(context, data) {
             context.commit('deleteMoneyAccount', data);
+        },
+        updateTotalMoney(context) {
+            let totalMoney = 0;
+            const moneyAccounts = context.state.localStorage.moneyAccounts;
+            moneyAccounts.forEach(account => totalMoney += account.money);
+            context.commit('updateTotalMoney', totalMoney);
         }
     },
     mutations: {
@@ -83,22 +92,25 @@ export const store = new Vuex.Store({
         },
         */
         setLocalStorage(state) {
-            state.localStorage = localStorage.getItem('state') ? JSON.parse(localStorage.getItem('state')) : {
-                drawer: false,
-                toolbarTitle: 'Übersicht',
-                moneyAccounts: [
-                    {
-                        name: 'Sparkasse',
-                        money: '1000',
-                        color: "#EA0A8E"
-                    },
-                    {
-                        name: 'ING DiBa',
-                        money: '2000',
-                        color: "#FF6600"
-                    }
-                ]
-            };
+            state.localStorage = localStorage.getItem('state') ? JSON.parse(localStorage.getItem('state')) : ( () => {
+                let obj = {
+                    toolbarTitle: 'Übersicht',
+                    moneyAccounts: [
+                        {
+                            name: 'Sparkasse',
+                            money: 1000,
+                            color: "#EA0A8E"
+                        },
+                        {
+                            name: 'ING DiBa',
+                            money: 2000,
+                            color: "#FF6600"
+                        }
+                    ]
+                };
+                obj.totalMoney = obj.moneyAccounts[0].money + obj.moneyAccounts[1].money;
+                return obj;
+            })
         },
         setDrawer(state) {
             state.drawer = !state.drawer;
@@ -116,6 +128,10 @@ export const store = new Vuex.Store({
         },
         deleteMoneyAccount(state, data) {
             state.localStorage.moneyAccounts.splice(data.item, 1);
+            localStorage.setItem('state', JSON.stringify(state.localStorage));
+        },
+        updateTotalMoney(state, updatedTotalMoney) {
+            state.localStorage.totalMoney = updatedTotalMoney;
             localStorage.setItem('state', JSON.stringify(state.localStorage));
         }
     }
