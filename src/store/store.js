@@ -51,8 +51,16 @@ export const store = new Vuex.Store({
         getTotalMoney(state) {
             return state.localStorage.totalMoney;
         },
-        getFormattedTotalMoney (state) {
+        getFormattedTotalMoney(state) {
             return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(state.localStorage.totalMoney)
+        },
+        getMoneyAccountNames(state) {
+            let names = [];
+            state.localStorage.moneyAccounts.forEach( (account) => names.push(account.name) );
+            return names;
+        },
+        getTransactions(state) {
+            return state.localStorage.transactions;
         }
     },
     actions: {
@@ -108,6 +116,15 @@ export const store = new Vuex.Store({
                             name: 'ING DiBa',
                             money: 2000,
                             color: "#FF6600"
+                        }
+                    ],
+                    transactions: [
+                        {
+                            name: 'Robux',
+                            description: 'Meine Nichte ist süchtig...',
+                            moneyAccount: 'Sparkasse',
+                            money: 10,
+                            date: '05.11.2021',
                         }
                     ]
                 };

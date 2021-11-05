@@ -9,6 +9,7 @@ import TransactionsPage from "@/components/transactions/TransactionsPage";
 import RepeatingTransactionsPage from "@/components/RepeatingTransactionsPage";
 import MoneyAccountsPage from "@/components/moneyAccounts/page/MoneyAccountsPage";
 import MoneyAccountForm from "@/components/moneyAccounts/form/MoneyAccountForm";
+import TransactionForm from "@/components/transactions/form/TransactionForm";
 
 
 const routes = [
@@ -27,6 +28,12 @@ const routes = [
     name: 'transactions',
     component: TransactionsPage,
     meta: { title: 'Transaktionen' }
+  },
+  {
+    path: '/transactions/:item',
+    name: 'transactionForm',
+    component: TransactionForm,
+    meta: { formType: 'Transaktions-Formular' }
   },
   {
     path: '/repeatingTransactions',
@@ -57,6 +64,7 @@ const routes = [
     path: '/moneyAccounts/:item',
     name: 'moneyAccountForm',
     component: MoneyAccountForm,
+    meta: { formType: 'Konto-Formular' }
     /*
     beforeEnter: (to) =>  {
       if(to.params.item == 'new') {

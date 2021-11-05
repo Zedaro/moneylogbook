@@ -9,7 +9,7 @@
 <script>
 import MoneyAccountItem from "@/components/moneyAccounts/page/MoneyAccountItem";
 export default {
-  name: "MoneyAccountList",
+  name: "MoneyAccountsList",
   components: { MoneyAccountItem }
 }
 </script>

@@ -1,6 +1,6 @@
 <template>
   <v-app-bar app>
-    <v-app-bar-nav-icon v-if="Object.keys($route.params).length === 0" @click="clickDrawer"></v-app-bar-nav-icon>
+    <v-app-bar-nav-icon v-if="Object.keys($route.params).length === 0 && this.$route.params.item !== 'new'" @click="clickDrawer"></v-app-bar-nav-icon>   <!-- Object.keys($route.params).length === 0 -->
     <v-app-bar-nav-icon v-else @click="$router.back()">
       <v-icon>mdi-arrow-left</v-icon></v-app-bar-nav-icon>
     <v-toolbar-title>{{ toolbarTitle }}</v-toolbar-title>
@@ -23,9 +23,18 @@ export default {
         return this.$route.meta.title;
       }
       else if(this.$route.params.item === 'new')
-        return 'Neues Konto';
-      else
-        return 'Konto bearbeiten';
+        if(this.$route.meta.formType === 'Konto-Formular') {
+          return 'Neues Konto';
+        } else {
+          return 'Neue Transaktion';
+        }
+      else {
+        if(this.$route.meta.formType === 'Konto-Formular') {
+          return 'Konto bearbeiten';
+        } else {
+          return 'Transaktion bearbeiten';
+        }
+      }
     }
   },
   methods: {
@@ -49,6 +58,15 @@ export default {
             name: 'ING DiBa',
             money: 2000,
             color: "#FF6600"
+          }
+        ],
+        transactions: [
+          {
+            name: 'Robux',
+            description: 'Meine Nichte ist süchtig...',
+            moneyAccount: 'Sparkasse',
+            money: 10,
+            date: '05.11.2021',
           }
         ]
       };
