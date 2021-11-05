@@ -49,7 +49,10 @@ export const store = new Vuex.Store({
             return state.localStorage.moneyAccounts;
         },
         getTotalMoney(state) {
-            return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(state.localStorage.totalMoney);
+            return state.localStorage.totalMoney;
+        },
+        getFormattedTotalMoney (state) {
+            return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(state.localStorage.totalMoney)
         }
     },
     actions: {

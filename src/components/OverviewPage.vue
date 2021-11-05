@@ -22,7 +22,7 @@ export default {
   components: { DoughnutChart, MoneyAccountsList, PlusMinus },
   computed: {
     totalMoney() {
-        return this.$store.getters.getTotalMoney;
+        return this.$store.getters.getFormattedTotalMoney;
       //this.money.replace(/\./g, ',') €
     }
   },

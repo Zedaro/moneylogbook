@@ -5,7 +5,7 @@ import VueRouter from 'vue-router';
 Vue.use(VueRouter)
 
 import OverviewPage from "@/components/OverviewPage";
-import TransactionsPage from "@/components/TransactionsPage";
+import TransactionsPage from "@/components/transactions/TransactionsPage";
 import RepeatingTransactionsPage from "@/components/RepeatingTransactionsPage";
 import MoneyAccountsPage from "@/components/moneyAccounts/page/MoneyAccountsPage";
 import MoneyAccountForm from "@/components/moneyAccounts/form/MoneyAccountForm";
