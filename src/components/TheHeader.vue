@@ -19,20 +19,27 @@ export default {
   },
   computed: {
     toolbarTitle() {
+      //Übersichts-Seiten
       if(this.$route.meta.title) {
         return this.$route.meta.title;
       }
+      //Neuer Eintrag
       else if(this.$route.params.item === 'new')
         if(this.$route.meta.formType === 'Konto-Formular') {
           return 'Neues Konto';
-        } else {
+        } else if(this.$route.meta.formType === 'Transaktions-Formular') {
           return 'Neue Transaktion';
+        } else {
+          return 'Neuer Dauerauftrag';
         }
+      //Eintrag bearbeiten
       else {
         if(this.$route.meta.formType === 'Konto-Formular') {
           return 'Konto bearbeiten';
-        } else {
+        } else if(this.$route.meta.formType === 'Transaktions-Formular') {
           return 'Transaktion bearbeiten';
+        } else {
+          return 'Dauerauftrag bearbeiten';
         }
       }
     }

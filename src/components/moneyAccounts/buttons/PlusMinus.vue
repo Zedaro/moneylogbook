@@ -15,9 +15,14 @@
     name: "PlusMinus",
     computed: {
       item() {
-        if(this.$route.meta.title == 'Übersicht') {
+        if(this.$route.meta.title === 'Übersicht') {
           return {
             name: 'moneyAccountForm',
+            params: { item: 'new' }
+          };
+        } else if(this.$route.meta.title === 'Daueraufträge') {
+          return {
+            name: 'repeatingTransactionForm',
             params: { item: 'new' }
           };
         } else {
