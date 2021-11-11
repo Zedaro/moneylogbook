@@ -51,7 +51,7 @@ export default {
         moneyAccounts: [
           {
             name: 'Sparkasse',
-            money: 1000,
+            money: 1010,
             color: "#EA0A8E"
           },
           {
@@ -66,7 +66,7 @@ export default {
             description: 'Meine Nichte ist süchtig...',
             moneyAccount: 'Sparkasse',
             money: 10,
-            date: '05.11.2021',
+            date: '2021-11-05'
           }
         ]
       };

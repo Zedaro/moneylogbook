@@ -91,6 +91,29 @@ export const store = new Vuex.Store({
             const moneyAccounts = context.state.localStorage.moneyAccounts;
             moneyAccounts.forEach(account => totalMoney += account.money);
             context.commit('updateTotalMoney', totalMoney);
+        },
+        saveTransaction(context, data) {
+            //Das ist der Account von der neuen Transaktion!!!
+            data.accountIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === data.moneyAccount);
+
+            if(data.item === 'new') {
+                context.commit('saveNewTransaction', data);
+            } else {
+                //hol dir alte und neue Transaktion. Vergleiche die moneyAccount Einträge
+                const oldTransaction = context.state.localStorage.transactions[data.item];
+                data.oldTransaction = oldTransaction;
+                if(oldTransaction.moneyAccount === data.moneyAccount) {
+                    context.commit('saveEditedTransaction', data);
+                } else {
+                    data.oldAccountIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === oldTransaction.moneyAccount);
+                    context.commit('saveEditedTransactionWithNewMoneyAccount', data);
+                }
+            }
+        },
+        deleteTransaction(context, data) {
+            data.accountIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === data.moneyAccount);
+
+            context.commit('deleteTransaction', data);
         }
     },
     mutations: {
@@ -109,7 +132,7 @@ export const store = new Vuex.Store({
                     moneyAccounts: [
                         {
                             name: 'Sparkasse',
-                            money: 1000,
+                            money: 1010,
                             color: "#EA0A8E"
                         },
                         {
@@ -124,7 +147,7 @@ export const store = new Vuex.Store({
                             description: 'Meine Nichte ist süchtig...',
                             moneyAccount: 'Sparkasse',
                             money: 10,
-                            date: '05.11.2021',
+                            date: '2021-11-05'
                         }
                     ]
                 };
@@ -152,6 +175,34 @@ export const store = new Vuex.Store({
         },
         updateTotalMoney(state, updatedTotalMoney) {
             state.localStorage.totalMoney = updatedTotalMoney;
+            localStorage.setItem('state', JSON.stringify(state.localStorage));
+        },
+        saveNewTransaction(state, data) {
+            state.localStorage.transactions.push({ name: data.name, description: data.description, money: data.money, moneyAccount: data.moneyAccount, date: data.date });
+            state.localStorage.moneyAccounts[data.accountIndex].money += data.money;
+            localStorage.setItem('state', JSON.stringify(state.localStorage));
+        },
+        saveEditedTransaction(state, data) {
+            const newTransaction = data.money;
+            //accountIndex wird noch nicht übergeben
+            state.localStorage.moneyAccounts[data.accountIndex].money += (newTransaction - data.oldTransaction.money);
+            state.localStorage.transactions[data.item] = { name: data.name, description: data.description, money: data.money, moneyAccount: data.moneyAccount, date: data.date };
+            localStorage.setItem('state', JSON.stringify(state.localStorage));
+        },
+        saveEditedTransactionWithNewMoneyAccount(state, data) {
+            const newTransaction = data.money;
+
+            //Alten Betrag der vorherigen Transaktion von deren Konto abziehen / wieder drauf rechnen.
+            state.localStorage.moneyAccounts[data.oldAccountIndex].money -= data.oldTransaction.money;
+
+            //Neuen Betrag auf neues Konto anrechnen
+            state.localStorage.moneyAccounts[data.accountIndex].money += newTransaction;
+            state.localStorage.transactions[data.item] = { name: data.name, description: data.description, money: data.money, moneyAccount: data.moneyAccount, date: data.date };
+            localStorage.setItem('state', JSON.stringify(state.localStorage));
+        },
+        deleteTransaction(state, data) {
+            state.localStorage.moneyAccounts[data.accountIndex].money -= data.money;
+            state.localStorage.transactions.splice(data.item, 1);
             localStorage.setItem('state', JSON.stringify(state.localStorage));
         }
     }

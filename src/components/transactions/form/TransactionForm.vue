@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-card>
-      <v-form ref="moneyAccountForm">
+      <v-form ref="transactionForm">
 
         <v-text-field counter="100"
                       label="Name"
@@ -37,7 +37,7 @@
         ></v-text-field>
 
         <v-menu
-            v-model="menu2"
+            v-model="menu"
             :close-on-content-click="false"
             :nudge-right="40"
             transition="scale-transition"
@@ -46,8 +46,8 @@
         >
           <template v-slot:activator="{ on, attrs }">
             <v-text-field
-                v-model="date"
-                label="Picker without buttons"
+                v-model="computedDateFormatted"
+                label="Datum"
                 prepend-icon="mdi-calendar"
                 readonly
                 v-bind="attrs"
@@ -57,14 +57,10 @@
           <v-date-picker
               v-model="date"
               no-title
-              @input="menu2 = false"
+              scrollable
+              @input="menu = false"
           ></v-date-picker>
         </v-menu>
-
-        <v-color-picker mode="hexa"
-                        v-model="color"
-                        readonly
-        ></v-color-picker>
 
         <save-delete @saveData="saveData"
                      @deleteData="deleteData"
@@ -97,7 +93,7 @@ export default {
     ];
 
 
-    if (this.$route.params.item == 'new') {
+    if (this.$route.params.item === 'new') {
       return {
         new: true,
         name: '',
@@ -105,27 +101,30 @@ export default {
         items: (this.$store.getters.getMoneyAccountNames),
         moneyAccount: '',
         money: null,
-        color: '#000000',
+        //color: '#000000',
         nameRules: nameRules,
         moneyRules: moneyRules,
         selectRules: selectRules,
 
         date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-        menu2: false
+        menu: false
       };
     }
     else {
       return {
         new: false,
-        name: (this.$store.getters.getMoneyAccounts[this.$route.params.item].name),
+        name: (this.$store.getters.getTransactions[this.$route.params.item].name),
         description: (this.$store.getters.getTransactions[this.$route.params.item].description),
         items: (this.$store.getters.getMoneyAccountNames),
         moneyAccount: (this.$store.getters.getTransactions[this.$route.params.item].moneyAccount),
-        money: (this.$store.getters.getMoneyAccounts[this.$route.params.item].money),
-        color: (this.$store.getters.getMoneyAccounts[this.$route.params.item].color),
+        money: (this.$store.getters.getTransactions[this.$route.params.item].money),
+        date: (this.$store.getters.getTransactions[this.$route.params.item].date),
+        //color: (this.$store.getters.getMoneyAccounts[this.$route.params.item].color),
         nameRules: nameRules,
         moneyRules: moneyRules,
-        selectRules: selectRules
+        selectRules: selectRules,
+
+        menu: false
       };
     }
 
@@ -142,6 +141,11 @@ export default {
     */
 
   },
+  computed: {
+    computedDateFormatted() {
+      return this.formatDate(this.date);
+    }
+  },
   methods: {
     test() {
       /*
@@ -151,8 +155,12 @@ export default {
       console.log(this.color);
        */
     },
+    formatDate(date) {
+      const [year, month, day] = date.split('-');
+      return `${day}.${month}.${year}`;
+    },
     saveData() {
-      if(this.$refs.moneyAccountForm.validate()) {
+      if(this.$refs.transactionForm.validate()) {
         /*
         if(typeof this.money == 'string') {
           this.money = parseFloat(this.money);
@@ -164,24 +172,39 @@ export default {
           description: this.description,
           moneyAccount: this.moneyAccount,
           money: parseFloat(this.money.toFixed(2)),   //.replace(/\./g, ','),
-          color: this.color
+          date: this.date,
+          //color: this.color
         };
-        this.$store.dispatch('saveMoneyAccount', data)
+        this.$store.dispatch('saveTransaction', data)
             .then( () => {
               this.$store.dispatch('updateTotalMoney');
             })
+            /*.then( () => {
+              console.log(this.$store.getters.getLocalStorage);
+            })
+            */
             .then(() => {
-              this.$router.push({name: 'overview'});
+              this.$router.push({name: 'transactions'});
             });
       }
     },
     deleteData() {
-      this.$store.dispatch('deleteMoneyAccount', { item: this.$route.params.item })
+      const data = {
+        item: this.$route.params.item,
+        name: this.name,
+        description: this.description,
+        moneyAccount: this.moneyAccount,
+        money: parseFloat(this.money.toFixed(2)),   //.replace(/\./g, ','),
+        date: this.date,
+        //color: this.color
+      };
+
+      this.$store.dispatch('deleteTransaction', data)
           .then( () => {
             this.$store.dispatch('updateTotalMoney');
           })
           .then(() => {
-            this.$router.push({name: 'overview'});
+            this.$router.push({name: 'transactions'});
           });
     }
   },
