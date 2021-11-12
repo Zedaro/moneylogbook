@@ -61,6 +61,9 @@ export const store = new Vuex.Store({
         },
         getTransactions(state) {
             return state.localStorage.transactions;
+        },
+        getTransfers(state) {
+            return state.localStorage.transfers;
         }
     },
     actions: {
@@ -114,6 +117,22 @@ export const store = new Vuex.Store({
             data.accountIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === data.moneyAccount);
 
             context.commit('deleteTransaction', data);
+        },
+
+        saveTransfer(context, data) {
+            //Das ist der Account von der neuen Transaktion!!!
+            data.fromIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === data.from);
+            data.toIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === data.to);
+
+            if(data.item === 'new') {
+                context.commit('saveNewTransfer', data);
+            }
+        },
+        deleteTransfer(context, data) {
+            data.fromIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === data.from);
+            data.toIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === data.to);
+
+            context.commit('deleteTransfer', data);
         }
     },
     mutations: {
@@ -146,6 +165,16 @@ export const store = new Vuex.Store({
                             name: 'Robux',
                             description: 'Meine Nichte ist süchtig...',
                             moneyAccount: 'Sparkasse',
+                            money: 10,
+                            date: '2021-11-05'
+                        }
+                    ],
+                    transfers: [
+                        {
+                            name: 'Umbuchung 1',
+                            description: 'Test',
+                            from: 'ING DiBa',
+                            to: 'Sparkasse',
                             money: 10,
                             date: '2021-11-05'
                         }
@@ -203,6 +232,23 @@ export const store = new Vuex.Store({
         deleteTransaction(state, data) {
             state.localStorage.moneyAccounts[data.accountIndex].money -= data.money;
             state.localStorage.transactions.splice(data.item, 1);
+            localStorage.setItem('state', JSON.stringify(state.localStorage));
+        },
+
+        saveNewTransfer(state, data) {
+            state.localStorage.transfers.push({ name: data.name, description: data.description, money: data.money, from: data.from, to: data.to, date: data.date });
+
+            state.localStorage.moneyAccounts[data.fromIndex].money -= data.money;
+            state.localStorage.moneyAccounts[data.toIndex].money += data.money;
+
+            localStorage.setItem('state', JSON.stringify(state.localStorage));
+        },
+        deleteTransfer(state, data) {
+            state.localStorage.moneyAccounts[data.fromIndex].money += data.money;
+            state.localStorage.moneyAccounts[data.toIndex].money -= data.money;
+
+            state.localStorage.transfers.splice(data.item, 1);
+
             localStorage.setItem('state', JSON.stringify(state.localStorage));
         }
     }

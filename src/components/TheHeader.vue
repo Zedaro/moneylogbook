@@ -75,6 +75,16 @@ export default {
             money: 10,
             date: '2021-11-05'
           }
+        ],
+        transfers: [
+          {
+            name: 'Umbuchung 1',
+            description: 'Test',
+            from: 'ING DiBa',
+            to: 'Sparkasse',
+            money: 10,
+            date: '2021-11-05'
+          }
         ]
       };
       state.totalMoney = state.moneyAccounts[0].money + state.moneyAccounts[1].money;

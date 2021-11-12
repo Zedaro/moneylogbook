@@ -20,6 +20,11 @@
             name: 'moneyAccountForm',
             params: { item: 'new' }
           };
+        } else if(this.$route.meta.title === 'Transaktionen') {
+          return {
+            name: 'transactionForm',
+            params: { item: 'new' }
+          };
         } else if(this.$route.meta.title === 'Daueraufträge') {
           return {
             name: 'repeatingTransactionForm',
@@ -27,7 +32,7 @@
           };
         } else {
           return {
-            name: 'transactionForm',
+            name: 'transferForm',
             params: { item: 'new' }
           };
         }

@@ -36,6 +36,10 @@ export default {
           pathName: 'repeatingTransactions',
           title: 'Daueraufträge'
         },
+        {
+          pathName: 'transfers',
+          title: 'Umbuchungen'
+        }
           /*
         {
           pathName: 'moneyAccounts',

@@ -11,6 +11,8 @@ import MoneyAccountsPage from "@/components/moneyAccounts/page/MoneyAccountsPage
 import MoneyAccountForm from "@/components/moneyAccounts/form/MoneyAccountForm";
 import TransactionForm from "@/components/transactions/form/TransactionForm";
 import RepeatingTransactionForm from "@/components/repeatingTransactions/form/RepeatingTransactionForm";
+import TransfersPage from "@/components/transfer/TransfersPage";
+import TransferForm from "@/components/transfer/TransferForm";
 
 
 const routes = [
@@ -47,6 +49,18 @@ const routes = [
     name: 'repeatingTransactionForm',
     component: RepeatingTransactionForm,
     meta: { formType: 'Dauerauftrags-Formular' }
+  },
+  {
+    path: '/transfers',
+    name: 'transfers',
+    component: TransfersPage,
+    meta: { title: 'Umbuchungen' }
+  },
+  {
+    path: '/transfers/:item',
+    name: 'transferForm',
+    component: TransferForm,
+    meta: { formType: 'Umbuchungs-Formular' }
   },
   {
     path: '/moneyAccounts',
