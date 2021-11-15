@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-card>
-      <v-form ref="transactionForm">
+      <v-form ref="transferForm">
 
         <v-text-field counter="100"
                       label="Name"
@@ -26,7 +26,7 @@
             :items="items"
             label="Von"
             v-model="from"
-            :rules="selectRules"
+            :rules="fromRules"
         ></v-select>
 
         <v-select
@@ -34,7 +34,7 @@
             :items="items"
             label="Zu"
             v-model="to"
-            :rules="selectRules"
+            :rules="toRules"
         ></v-select>
 
         <v-text-field type="number"
@@ -98,10 +98,39 @@ export default {
       v => !!v || "Geben Sie bitte einen Betrag an",
       v => v > 0 || "Geben Sie bitte einen positiven Betrag an"
     ];
+    /*
     const selectRules = [
-      v => {
-        if (this.$refs.to.value != undefined && this.$refs.from.value != undefined) {
-          return (this.$refs.from.value !== this.$refs.to.value) || "Bitte geben Sie zwei verschiedene Konten an";
+      (v) => {
+          //return (console.log(this.to)) || 'Hello';
+        if (this.to != '' && this.from != '') {
+          //console.log(this.$refs.to.value);
+          //(this.$refs.from.value !== this.$refs.to.value ? console.log('not equal') : console.log('equal'));
+          return (this.from !== this.to) || "Bitte geben Sie zwei verschiedene Konten an";
+        } else {
+          return !!v || "Geben Sie bitte ein Konto an";
+        }
+      }
+    ];
+    */
+    const fromRules = [
+      (v) => {
+        //return (console.log(this.to)) || 'Hello';
+        if (v !== '' && this.to !== '') {
+          //console.log(this.$refs.to.value);
+          //(this.$refs.from.value !== this.$refs.to.value ? console.log('not equal') : console.log('equal'));
+          return (v !== this.to) || "Bitte geben Sie zwei verschiedene Konten an";
+        } else {
+          return !!v || "Geben Sie bitte ein Konto an";
+        }
+      }
+    ];
+    const toRules = [
+      (v) => {
+        //return (console.log(this.to)) || 'Hello';
+        if (v !== '' && this.from !== '') {
+          //console.log(this.$refs.to.value);
+          //(this.$refs.from.value !== this.$refs.to.value ? console.log('not equal') : console.log('equal'));
+          return (v !== this.from) || "Bitte geben Sie zwei verschiedene Konten an";
         } else {
           return !!v || "Geben Sie bitte ein Konto an";
         }
@@ -133,7 +162,9 @@ export default {
         //color: '#000000',
         nameRules: nameRules,
         moneyRules: moneyRules,
-        selectRules: selectRules,
+        //selectRules: selectRules,
+        fromRules: fromRules,
+        toRules: toRules,
         //fromRules: fromRules,
         //toRules: toRules,
 
@@ -154,7 +185,9 @@ export default {
         //color: (this.$store.getters.getMoneyAccounts[this.$route.params.item].color),
         nameRules: nameRules,
         moneyRules: moneyRules,
-        selectRules: selectRules,
+        //selectRules: selectRules,
+        fromRules: fromRules,
+        toRules: toRules,
         //fromRules: fromRules,
         //toRules: toRules,
 
@@ -194,7 +227,7 @@ export default {
       return `${day}.${month}.${year}`;
     },
     saveData() {
-      if(this.$refs.transactionForm.validate()) {
+      if(this.$refs.transferForm.validate()) {
         /*
         if(typeof this.money == 'string') {
           this.money = parseFloat(this.money);

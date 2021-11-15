@@ -126,6 +126,16 @@ export const store = new Vuex.Store({
 
             if(data.item === 'new') {
                 context.commit('saveNewTransfer', data);
+            } else {
+                //hol dir alte und neue Transaktion. Vergleiche die moneyAccount Einträge
+                data.oldTransfer = context.state.localStorage.transfers[data.item];
+                if(data.oldTransfer.from === data.from  &&  data.oldTransfer.to === data.to) {
+                    context.commit('saveEditedTransfer', data);
+                } else {
+                    data.oldTransfer.fromIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === data.oldTransfer.from);
+                    data.oldTransfer.toIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === data.oldTransfer.to);
+                    context.commit('saveEditedTransferWithNewFromTo', data);
+                }
             }
         },
         deleteTransfer(context, data) {
@@ -215,6 +225,7 @@ export const store = new Vuex.Store({
             const newTransaction = data.money;
             //accountIndex wird noch nicht übergeben
             state.localStorage.moneyAccounts[data.accountIndex].money += (newTransaction - data.oldTransaction.money);
+
             state.localStorage.transactions[data.item] = { name: data.name, description: data.description, money: data.money, moneyAccount: data.moneyAccount, date: data.date };
             localStorage.setItem('state', JSON.stringify(state.localStorage));
         },
@@ -242,6 +253,61 @@ export const store = new Vuex.Store({
             state.localStorage.moneyAccounts[data.toIndex].money += data.money;
 
             localStorage.setItem('state', JSON.stringify(state.localStorage));
+        },
+        saveEditedTransfer(state, data) {
+            const newTransfer = data.money;
+            state.localStorage.moneyAccounts[data.fromIndex].money -= (newTransfer - data.oldTransfer.money);
+            state.localStorage.moneyAccounts[data.toIndex].money += (newTransfer - data.oldTransfer.money);
+
+            //State und localStorage updaten
+            state.localStorage.transfers[data.item] = { name: data.name, description: data.description, money: data.money, from: data.from, to: data.to, date: data.date };
+            localStorage.setItem('state', JSON.stringify(state.localStorage));
+        },
+        saveEditedTransferWithNewFromTo(state, data) {
+            const newTransferMoney = data.money;
+
+            //from und to haben sich geändert
+            if(data.oldTransfer.from !== data.from  &&  data.oldTransfer.to !== data.to) {
+                //Geld beim alten from wiederherstellen
+                state.localStorage.moneyAccounts[data.oldTransfer.fromIndex].money += data.oldTransfer.money;
+                //Umbuchung vom neuen from abrechnen
+                state.localStorage.moneyAccounts[data.fromIndex].money -= data.money;
+                //Geld vom alten to wieder abziehen
+                state.localStorage.moneyAccounts[data.oldTransfer.toIndex].money -= data.oldTransfer.money;
+                //Umbuchung auf das neue to rechnen
+                state.localStorage.moneyAccounts[data.toIndex].money += data.money;
+
+                //State und localStorage updaten
+                state.localStorage.transfers[data.item] = { name: data.name, description: data.description, money: data.money, from: data.from, to: data.to, date: data.date };
+                localStorage.setItem('state', JSON.stringify(state.localStorage));
+            }
+            //from hat sich geändert
+            else if(data.oldTransfer.from !== data.from) {
+                //Geld beim alten from wiederherstellen
+                state.localStorage.moneyAccounts[data.oldTransfer.fromIndex].money += data.oldTransfer.money;
+                //Umbuchung vom neuen from abrechnen
+                state.localStorage.moneyAccounts[data.fromIndex].money -= data.money;
+                //to updaten
+                state.localStorage.moneyAccounts[data.toIndex].money += (newTransferMoney - data.oldTransfer.money);
+
+                //State und localStorage updaten
+                state.localStorage.transfers[data.item] = { name: data.name, description: data.description, money: data.money, from: data.from, to: data.to, date: data.date };
+                localStorage.setItem('state', JSON.stringify(state.localStorage));
+            }
+            //to hat sich geändert
+            else {
+                console.log('to');
+                //Geld vom alten to wieder abziehen
+                state.localStorage.moneyAccounts[data.oldTransfer.toIndex].money -= data.oldTransfer.money;
+                //Umbuchung auf das neue to rechnen
+                state.localStorage.moneyAccounts[data.toIndex].money += data.money;
+                //from updaten
+                state.localStorage.moneyAccounts[data.fromIndex].money -= (newTransferMoney - data.oldTransfer.money);
+
+                //State und localStorage updaten
+                state.localStorage.transfers[data.item] = { name: data.name, description: data.description, money: data.money, from: data.from, to: data.to, date: data.date };
+                localStorage.setItem('state', JSON.stringify(state.localStorage));
+            }
         },
         deleteTransfer(state, data) {
             state.localStorage.moneyAccounts[data.fromIndex].money += data.money;

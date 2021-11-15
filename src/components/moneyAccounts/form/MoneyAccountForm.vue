@@ -15,9 +15,15 @@
                       v-model.number="money"
                       :rules="this.moneyRules"
         ></v-text-field>
+
+        <v-input-colorpicker v-model="color" />
+
+        <!--
         <v-color-picker mode="hexa"
                         v-model="color">
         </v-color-picker>
+        -->
+
         <save-delete @saveData="saveData"
                      @deleteData="deleteData"
         ></save-delete>
@@ -32,9 +38,10 @@
 
 <script>
 import SaveDelete from "@/components/moneyAccounts/buttons/SaveDelete";
+import InputColorPicker from 'vue-native-color-picker'
 export default {
   name: "MoneyAccountForm",
-  components: { SaveDelete },
+  components: { SaveDelete, "v-input-colorpicker": InputColorPicker },
   data() {
 
     // eslint-disable-next-line no-unused-vars
