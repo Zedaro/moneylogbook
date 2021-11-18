@@ -29,8 +29,10 @@ export default {
           return 'Neues Konto';
         } else if(this.$route.meta.formType === 'Transaktions-Formular') {
           return 'Neue Transaktion';
-        } else {
+        } else if(this.$route.meta.formType === 'Dauerauftrags-Formular') {
           return 'Neuer Dauerauftrag';
+        } else {
+          return 'Neue Umbuchung';
         }
       //Eintrag bearbeiten
       else {
@@ -38,8 +40,10 @@ export default {
           return 'Konto bearbeiten';
         } else if(this.$route.meta.formType === 'Transaktions-Formular') {
           return 'Transaktion bearbeiten';
-        } else {
+        } else if(this.$route.meta.formType === 'Dauerauftrags-Formular') {
           return 'Dauerauftrag bearbeiten';
+        } else {
+          return 'Umbuchung bearbeiten';
         }
       }
     }
@@ -52,44 +56,7 @@ export default {
       console.log(this.$router);
     },
     newLocalStorage() {
-      localStorage.clear();
-      let state = {
-        toolbarTitle: 'Übersicht',
-        moneyAccounts: [
-          {
-            name: 'Sparkasse',
-            money: 1010,
-            color: "#EA0A8E"
-          },
-          {
-            name: 'ING DiBa',
-            money: 2000,
-            color: "#FF6600"
-          }
-        ],
-        transactions: [
-          {
-            name: 'Robux',
-            description: 'Meine Nichte ist süchtig...',
-            moneyAccount: 'Sparkasse',
-            money: 10,
-            date: '2021-11-05'
-          }
-        ],
-        transfers: [
-          {
-            name: 'Umbuchung 1',
-            description: 'Test',
-            from: 'ING DiBa',
-            to: 'Sparkasse',
-            money: 10,
-            date: '2021-11-05'
-          }
-        ]
-      };
-      state.totalMoney = state.moneyAccounts[0].money + state.moneyAccounts[1].money;
-      localStorage.setItem('state', JSON.stringify(state));
-      window.location.reload();
+      this.$store.dispatch('setLocalStorage', true);
     }
   }
 }

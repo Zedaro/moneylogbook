@@ -13,7 +13,7 @@
 
 <script>
 
-import PlusMinus from "@/components/moneyAccounts/buttons/PlusMinus";
+import PlusMinus from "@/components/buttons/PlusMinus";
 import MoneyAccountsList from "@/components/moneyAccounts/page/MoneyAccountsList";
 export default {
   name: "MoneyAccountsPage",

@@ -1,6 +1,6 @@
 <template>
 
-  <v-card width="50%" :to="item">
+  <v-card width="50%" :to="moneyAccountsExist ? item : ''">
     <div class="color" :style="{ backgroundColor: color }"></div>
     <v-card-title class="card-title">{{ this.name }}</v-card-title>
     <v-card-text class="text-center grey--text">{{ this.description }}</v-card-text>
@@ -16,17 +16,18 @@
 <script>
 export default {
   name: "TransactionItem",
-  props: ['name', 'description', 'money', 'moneyAccount', 'date', 'index'],
+  props: ['color', 'name', 'description', 'money', 'moneyAccount', 'date', 'index'],
   computed: {
+    moneyAccountsExist() {
+      const account = this.$store.getters.getMoneyAccounts.find(account => account.name === this.moneyAccount);
+
+      return (typeof account != 'undefined');
+    },
     item() {
       return {
         name: 'transactionForm',
         params: { item: this.index }
       };
-    },
-    color() {
-      const account = this.$store.getters.getMoneyAccounts.find(account => account.name === this.moneyAccount);
-      return account.color;
     },
     moneyColor() {
       return ( (this.money > 0) ? 'green--text' : 'red--text' );

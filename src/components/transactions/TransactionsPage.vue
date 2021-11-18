@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import PlusMinus from "@/components/moneyAccounts/buttons/PlusMinus";
+import PlusMinus from "@/components/buttons/PlusMinus";
 import TransactionsList from "@/components/transactions/TransactionsList";
 export default {
   name: "TransactionsPage",

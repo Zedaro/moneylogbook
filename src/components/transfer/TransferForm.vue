@@ -3,6 +3,7 @@
     <v-card>
       <v-form ref="transferForm">
 
+        <!--  -->
         <v-text-field counter="100"
                       label="Name"
                       maxlength="100"
@@ -10,6 +11,7 @@
                       :rules="this.nameRules"
         ></v-text-field>
 
+        <!--  -->
         <v-textarea
             maxlength="1000"
             v-model="description"
@@ -21,22 +23,25 @@
           </template>
         </v-textarea>
 
+        <!--  -->
         <v-select
             ref="from"
-            :items="items"
+            :items="selectItems"
             label="Von"
             v-model="from"
             :rules="fromRules"
         ></v-select>
 
+        <!--  -->
         <v-select
             ref="to"
-            :items="items"
+            :items="selectItems"
             label="Zu"
             v-model="to"
             :rules="toRules"
         ></v-select>
 
+        <!--  -->
         <v-text-field type="number"
                       label="Geld"
                       step="0.01"
@@ -85,12 +90,12 @@
 </template>
 
 <script>
-import SaveDelete from "@/components/moneyAccounts/buttons/SaveDelete";
+import SaveDelete from "@/components/buttons/SaveDelete";
 export default {
   name: "TransferForm",
   components: { SaveDelete },
   data() {
-
+    /*
     const nameRules = [
       v => !!v || "Geben Sie bitte einen Namen an"
     ];
@@ -98,20 +103,6 @@ export default {
       v => !!v || "Geben Sie bitte einen Betrag an",
       v => v > 0 || "Geben Sie bitte einen positiven Betrag an"
     ];
-    /*
-    const selectRules = [
-      (v) => {
-          //return (console.log(this.to)) || 'Hello';
-        if (this.to != '' && this.from != '') {
-          //console.log(this.$refs.to.value);
-          //(this.$refs.from.value !== this.$refs.to.value ? console.log('not equal') : console.log('equal'));
-          return (this.from !== this.to) || "Bitte geben Sie zwei verschiedene Konten an";
-        } else {
-          return !!v || "Geben Sie bitte ein Konto an";
-        }
-      }
-    ];
-    */
     const fromRules = [
       (v) => {
         //return (console.log(this.to)) || 'Hello';
@@ -136,64 +127,76 @@ export default {
         }
       }
     ];
-
+    */
     /*
-    const fromRules = [
-      v => (v !== this.$refs.to.value) || "Bitte geben Sie zwei verschiedene Konten an"
+    const selectRules = [
+      (v) => {
+          //return (console.log(this.to)) || 'Hello';
+        if (this.to != '' && this.from != '') {
+          //console.log(this.$refs.to.value);
+          //(this.$refs.from.value !== this.$refs.to.value ? console.log('not equal') : console.log('equal'));
+          return (this.from !== this.to) || "Bitte geben Sie zwei verschiedene Konten an";
+        } else {
+          return !!v || "Geben Sie bitte ein Konto an";
+        }
+      }
     ];
-    const toRules = [
-      v => (v !== this.$refs.from.value) || "Bitte geben Sie zwei verschiedene Konten an"
-    ]
     */
 
-    //const obj = {};
+    const newForm = this.$route.params.item === 'new';
+    const transfers = this.$store.getters.getTransfers[this.$route.params.item];
 
+    return {
+      name: (newForm) ? ('') : (transfers.name),
+      description: (newForm) ? ('') : (transfers.description),
+      from: (newForm) ? ('') : (transfers.from),
+      to: (newForm) ? ('') : (transfers.to),
+      money: (newForm) ? (null) : (transfers.money),
+      date: (newForm) ? (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10) : (transfers.date),
 
-
-    if (this.$route.params.item === 'new') {
-      return {
-        new: true,
-        name: '',
-        description: '',
-        items: (this.$store.getters.getMoneyAccountNames),
-        from: '',
-        to: '',
-        money: null,
-        //color: '#000000',
-        nameRules: nameRules,
-        moneyRules: moneyRules,
-        //selectRules: selectRules,
-        fromRules: fromRules,
-        toRules: toRules,
-        //fromRules: fromRules,
-        //toRules: toRules,
-
-        date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-        menu: false
-      };
-    }
-    else {
-      return {
-        new: false,
-        name: (this.$store.getters.getTransfers[this.$route.params.item].name),
-        description: (this.$store.getters.getTransfers[this.$route.params.item].description),
-        items: (this.$store.getters.getMoneyAccountNames),
-        from: (this.$store.getters.getTransfers[this.$route.params.item].from),
-        to: (this.$store.getters.getTransfers[this.$route.params.item].to),
-        money: (this.$store.getters.getTransfers[this.$route.params.item].money),
-        date: (this.$store.getters.getTransfers[this.$route.params.item].date),
-        //color: (this.$store.getters.getMoneyAccounts[this.$route.params.item].color),
-        nameRules: nameRules,
-        moneyRules: moneyRules,
-        //selectRules: selectRules,
-        fromRules: fromRules,
-        toRules: toRules,
-        //fromRules: fromRules,
-        //toRules: toRules,
-
-        menu: false
-      };
-    }
+      selectItems: (this.$store.getters.getMoneyAccountNames),
+      /*
+      name: '',
+      description: '',
+      items: (this.$store.getters.getMoneyAccountNames),
+      from: '',
+      to: '',
+      money: null,
+      date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+      */
+      nameRules: [
+        v => !!v || "Geben Sie bitte einen Namen an"
+      ],
+      moneyRules: [
+        v => !!v || "Geben Sie bitte einen Betrag an",
+        v => v > 0 || "Geben Sie bitte einen positiven Betrag an"
+      ],
+      fromRules: [
+        (v) => {
+          //return (console.log(this.to)) || 'Hello';
+          if (v !== '' && this.to !== '') {
+            //console.log(this.$refs.to.value);
+            //(this.$refs.from.value !== this.$refs.to.value ? console.log('not equal') : console.log('equal'));
+            return (v !== this.to) || "Bitte geben Sie zwei verschiedene Konten an";
+          } else {
+            return !!v || "Geben Sie bitte ein Konto an";
+          }
+        }
+      ],
+      toRules: [
+        (v) => {
+          //return (console.log(this.to)) || 'Hello';
+          if (v !== '' && this.from !== '') {
+            //console.log(this.$refs.to.value);
+            //(this.$refs.from.value !== this.$refs.to.value ? console.log('not equal') : console.log('equal'));
+            return (v !== this.from) || "Bitte geben Sie zwei verschiedene Konten an";
+          } else {
+            return !!v || "Geben Sie bitte ein Konto an";
+          }
+        }
+      ],
+      menu: false
+    };
 
 
     /*
@@ -209,6 +212,48 @@ export default {
 
   },
   computed: {
+    /*
+    name() {
+      return (this.new) ? ('') : (this.transfers.name);
+    },
+    description() {
+      return (this.new) ? ('') : (this.transfers.description);
+    },
+    from() {
+      return (this.new) ? ('') : (this.transfers.from);
+    },
+    to() {
+      return (this.new) ? ('') : (this.transfers.to);
+    },
+    money() {
+      return (this.new) ? (null) : (this.transfers.money);
+    },
+    date() {
+      return (this.new) ? (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10) : (this.transfers.date);
+    },
+    */
+    /*
+    formData() {
+      if(this.new) {
+        return {
+          name: '',
+          description: '',
+          from: '',
+          to: '',
+          money: null,
+          date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+        };
+      } else {
+        return {
+          name: (this.$store.getters.getTransfers[this.$route.params.item].name),
+          description: (this.$store.getters.getTransfers[this.$route.params.item].description),
+          from: (this.$store.getters.getTransfers[this.$route.params.item].from),
+          to: (this.$store.getters.getTransfers[this.$route.params.item].to),
+          money: (this.$store.getters.getTransfers[this.$route.params.item].money),
+          date: (this.$store.getters.getTransfers[this.$route.params.item].date),
+        };
+      }
+    },*/
     computedDateFormatted() {
       return this.formatDate(this.date);
     }
@@ -235,6 +280,8 @@ export default {
         */
         const data = {
           item: this.$route.params.item,
+          colorFrom: this.$store.getters.getMoneyAccounts.find(account => account.name === this.from).color,
+          colorTo: this.$store.getters.getMoneyAccounts.find(account => account.name === this.to).color,
           name: this.name,
           description: this.description,
           from: this.from,

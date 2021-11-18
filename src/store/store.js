@@ -7,8 +7,62 @@ Vue.use(Vuex)
 export const store = new Vuex.Store({
     state: {
         drawer: false,
-        localStorage: null,
+        initialLocalStorage: ( () => {
+            let obj = {
+                toolbarTitle: 'Übersicht',
+                moneyAccounts: [
+                    {
+                        name: 'Sparkasse',
+                        money: 1010,
+                        color: "#EA0A8E"
+                    },
+                    {
+                        name: 'ING DiBa',
+                        money: 2000,
+                        color: "#FF6600"
+                    }
+                ],
+                transactions: [
+                    {
+                        color: '#EA0A8E',
+                        name: 'Robux',
+                        description: 'Meine Nichte ist süchtig...',
+                        moneyAccount: 'Sparkasse',
+                        money: 10,
+                        date: '2021-11-05'
+                    }
+                ],
+                repeatingTransactions: [
+                    {
+                        color: '#EA0A8E',
+                        name: 'Schweigegeld',
+                        description: '...',
+                        moneyAccount: 'Sparkasse',
+                        money: 50,
+                        startingDate: '2021-11-20',
+                        endingDate: '2021-12-20',
+                        rhythmNumber: 1,
+                        rhythmType: 'monthly'
+                    }
+                ],
+                transfers: [
+                    {
+                        colorFrom: '#FF6600',
+                        colorTo: '#EA0A8E',
+                        name: 'Umbuchung 1',
+                        description: 'Test',
+                        from: 'ING DiBa',
+                        to: 'Sparkasse',
+                        money: 10,
+                        date: '2021-11-05'
+                    }
+                ]
+            };
+            obj.totalMoney = obj.moneyAccounts[0].money + obj.moneyAccounts[1].money;
 
+            return obj;
+        }),
+        localStorage: null,
     },
 
         /*
@@ -67,8 +121,14 @@ export const store = new Vuex.Store({
         }
     },
     actions: {
-        setLocalStorage(context) {
-          context.commit('setLocalStorage');
+        setLocalStorage(context, update) {
+            if(update) {
+                localStorage.clear();
+
+                localStorage.setItem('state', JSON.stringify(context.state.initialLocalStorage()));
+                window.location.reload();
+            }
+            context.commit('setLocalStorage');
         },
         setState(context) {
             context.commit('setState');
@@ -79,6 +139,13 @@ export const store = new Vuex.Store({
         setTitle(context, title) {
           context.commit('setTitle', title);
         },
+        updateTotalMoney(context) {
+            let totalMoney = 0;
+            const moneyAccounts = context.state.localStorage.moneyAccounts;
+            moneyAccounts.forEach(account => totalMoney += account.money);
+            context.commit('updateTotalMoney', totalMoney);
+        },
+
         saveMoneyAccount(context, data) {
             if(data.item === 'new') {
                 context.commit('saveNewMoneyAccount', data);
@@ -89,12 +156,7 @@ export const store = new Vuex.Store({
         deleteMoneyAccount(context, data) {
             context.commit('deleteMoneyAccount', data);
         },
-        updateTotalMoney(context) {
-            let totalMoney = 0;
-            const moneyAccounts = context.state.localStorage.moneyAccounts;
-            moneyAccounts.forEach(account => totalMoney += account.money);
-            context.commit('updateTotalMoney', totalMoney);
-        },
+
         saveTransaction(context, data) {
             //Das ist der Account von der neuen Transaktion!!!
             data.accountIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === data.moneyAccount);
@@ -119,22 +181,57 @@ export const store = new Vuex.Store({
             context.commit('deleteTransaction', data);
         },
 
+        saveRepeatingTransaction(context, data) {
+            data.accountIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === data.moneyAccount);
+
+            if(data.item === 'new') {
+                context.commit('saveNewRepeatingTransaction', data);
+            } else {
+                //hol dir alte und neue Transaktion. Vergleiche die moneyAccount Einträge
+                const oldTransaction = context.state.localStorage.transactions[data.item];
+                data.oldTransaction = oldTransaction;
+                if(oldTransaction.moneyAccount === data.moneyAccount) {
+                    context.commit('saveEditedTransaction', data);
+                } else {
+                    data.oldAccountIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === oldTransaction.moneyAccount);
+                    context.commit('saveEditedTransactionWithNewMoneyAccount', data);
+                }
+            }
+        },
+
         saveTransfer(context, data) {
             //Das ist der Account von der neuen Transaktion!!!
             data.fromIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === data.from);
             data.toIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === data.to);
 
+            //Neue Umbuchung
             if(data.item === 'new') {
                 context.commit('saveNewTransfer', data);
-            } else {
-                //hol dir alte und neue Transaktion. Vergleiche die moneyAccount Einträge
+            }
+            //Umbuchung bearbeiten
+            else {
                 data.oldTransfer = context.state.localStorage.transfers[data.item];
+                //Umbuchung bearbeiten - ohne Kontoänderung
                 if(data.oldTransfer.from === data.from  &&  data.oldTransfer.to === data.to) {
                     context.commit('saveEditedTransfer', data);
-                } else {
+                }
+                //Umbuchung bearbeiten - mit Kontoänderung
+                else {
                     data.oldTransfer.fromIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === data.oldTransfer.from);
                     data.oldTransfer.toIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === data.oldTransfer.to);
-                    context.commit('saveEditedTransferWithNewFromTo', data);
+
+                    //from und to haben sich geändert
+                    if(data.oldTransfer.from !== data.from  &&  data.oldTransfer.to !== data.to) {
+                        context.commit('saveEditedTransferWithNewFromTo', data);
+                    }
+                    //from hat sich geändert
+                    else if(data.oldTransfer.from !== data.from) {
+                        context.commit('saveEditedTransferWithNewFrom', data);
+                    }
+                    //to hat sich geändert
+                    else {
+                        context.commit('saveEditedTransferWithNewTo', data);
+                    }
                 }
             }
         },
@@ -155,44 +252,7 @@ export const store = new Vuex.Store({
         },
         */
         setLocalStorage(state) {
-            state.localStorage = localStorage.getItem('state') ? JSON.parse(localStorage.getItem('state')) : ( () => {
-                let obj = {
-                    toolbarTitle: 'Übersicht',
-                    moneyAccounts: [
-                        {
-                            name: 'Sparkasse',
-                            money: 1010,
-                            color: "#EA0A8E"
-                        },
-                        {
-                            name: 'ING DiBa',
-                            money: 2000,
-                            color: "#FF6600"
-                        }
-                    ],
-                    transactions: [
-                        {
-                            name: 'Robux',
-                            description: 'Meine Nichte ist süchtig...',
-                            moneyAccount: 'Sparkasse',
-                            money: 10,
-                            date: '2021-11-05'
-                        }
-                    ],
-                    transfers: [
-                        {
-                            name: 'Umbuchung 1',
-                            description: 'Test',
-                            from: 'ING DiBa',
-                            to: 'Sparkasse',
-                            money: 10,
-                            date: '2021-11-05'
-                        }
-                    ]
-                };
-                obj.totalMoney = obj.moneyAccounts[0].money + obj.moneyAccounts[1].money;
-                return obj;
-            })
+            state.localStorage = localStorage.getItem('state') ? JSON.parse(localStorage.getItem('state')) : state.initialLocalStorage;
         },
         setDrawer(state) {
             state.drawer = !state.drawer;
@@ -200,6 +260,11 @@ export const store = new Vuex.Store({
         setTitle(state, title) {
           state.localStorage.toolbarTitle = title;
         },
+        updateTotalMoney(state, updatedTotalMoney) {
+            state.localStorage.totalMoney = updatedTotalMoney;
+            localStorage.setItem('state', JSON.stringify(state.localStorage));
+        },
+
         saveEditedMoneyAccount(state, data) {
             state.localStorage.moneyAccounts[data.item] = { name: data.name, money: data.money, color: data.color };
             localStorage.setItem('state', JSON.stringify(state.localStorage));
@@ -212,12 +277,9 @@ export const store = new Vuex.Store({
             state.localStorage.moneyAccounts.splice(data.item, 1);
             localStorage.setItem('state', JSON.stringify(state.localStorage));
         },
-        updateTotalMoney(state, updatedTotalMoney) {
-            state.localStorage.totalMoney = updatedTotalMoney;
-            localStorage.setItem('state', JSON.stringify(state.localStorage));
-        },
+
         saveNewTransaction(state, data) {
-            state.localStorage.transactions.push({ name: data.name, description: data.description, money: data.money, moneyAccount: data.moneyAccount, date: data.date });
+            state.localStorage.transactions.push({ color: data.color, name: data.name, description: data.description, money: data.money, moneyAccount: data.moneyAccount, date: data.date });
             state.localStorage.moneyAccounts[data.accountIndex].money += data.money;
             localStorage.setItem('state', JSON.stringify(state.localStorage));
         },
@@ -226,7 +288,7 @@ export const store = new Vuex.Store({
             //accountIndex wird noch nicht übergeben
             state.localStorage.moneyAccounts[data.accountIndex].money += (newTransaction - data.oldTransaction.money);
 
-            state.localStorage.transactions[data.item] = { name: data.name, description: data.description, money: data.money, moneyAccount: data.moneyAccount, date: data.date };
+            state.localStorage.transactions[data.item] = { color: data.color, name: data.name, description: data.description, money: data.money, moneyAccount: data.moneyAccount, date: data.date };
             localStorage.setItem('state', JSON.stringify(state.localStorage));
         },
         saveEditedTransactionWithNewMoneyAccount(state, data) {
@@ -237,7 +299,8 @@ export const store = new Vuex.Store({
 
             //Neuen Betrag auf neues Konto anrechnen
             state.localStorage.moneyAccounts[data.accountIndex].money += newTransaction;
-            state.localStorage.transactions[data.item] = { name: data.name, description: data.description, money: data.money, moneyAccount: data.moneyAccount, date: data.date };
+
+            state.localStorage.transactions[data.item] = { color: data.color, name: data.name, description: data.description, money: data.money, moneyAccount: data.moneyAccount, date: data.date };
             localStorage.setItem('state', JSON.stringify(state.localStorage));
         },
         deleteTransaction(state, data) {
@@ -246,8 +309,14 @@ export const store = new Vuex.Store({
             localStorage.setItem('state', JSON.stringify(state.localStorage));
         },
 
+        saveNewRepeatingTransaction(state, data) {
+            state.localStorage.repeatingTransactions.push({ color: data.color, name: data.name, description: data.description, money: data.money, moneyAccount: data.moneyAccount, startingDate: data.startingDate, endingDate: data.endingDate, rhythmNumber: data.rhythmNumber, rhythmType: data.rhythmType });
+            //state.localStorage.moneyAccounts[data.accountIndex].money += data.money;
+            localStorage.setItem('state', JSON.stringify(state.localStorage));
+        },
+
         saveNewTransfer(state, data) {
-            state.localStorage.transfers.push({ name: data.name, description: data.description, money: data.money, from: data.from, to: data.to, date: data.date });
+            state.localStorage.transfers.push({ colorFrom: data.colorFrom, colorTo: data.colorTo, name: data.name, description: data.description, money: data.money, from: data.from, to: data.to, date: data.date });
 
             state.localStorage.moneyAccounts[data.fromIndex].money -= data.money;
             state.localStorage.moneyAccounts[data.toIndex].money += data.money;
@@ -260,54 +329,53 @@ export const store = new Vuex.Store({
             state.localStorage.moneyAccounts[data.toIndex].money += (newTransfer - data.oldTransfer.money);
 
             //State und localStorage updaten
-            state.localStorage.transfers[data.item] = { name: data.name, description: data.description, money: data.money, from: data.from, to: data.to, date: data.date };
+            state.localStorage.transfers[data.item] = { colorFrom: data.colorFrom, colorTo: data.colorTo, name: data.name, description: data.description, money: data.money, from: data.from, to: data.to, date: data.date };
             localStorage.setItem('state', JSON.stringify(state.localStorage));
         },
         saveEditedTransferWithNewFromTo(state, data) {
+            //Geld beim alten from wiederherstellen
+            state.localStorage.moneyAccounts[data.oldTransfer.fromIndex].money += data.oldTransfer.money;
+            //Umbuchung vom neuen from abrechnen
+            state.localStorage.moneyAccounts[data.fromIndex].money -= data.money;
+            //Geld vom alten to wieder abziehen
+            state.localStorage.moneyAccounts[data.oldTransfer.toIndex].money -= data.oldTransfer.money;
+            //Umbuchung auf das neue to rechnen
+            state.localStorage.moneyAccounts[data.toIndex].money += data.money;
+
+            //State und localStorage updaten
+            state.localStorage.transfers[data.item] = { colorFrom: data.colorFrom, colorTo: data.colorTo, name: data.name, description: data.description, money: data.money, from: data.from, to: data.to, date: data.date };
+            localStorage.setItem('state', JSON.stringify(state.localStorage));
+        },
+        saveEditedTransferWithNewFrom(state, data) {
             const newTransferMoney = data.money;
 
-            //from und to haben sich geändert
-            if(data.oldTransfer.from !== data.from  &&  data.oldTransfer.to !== data.to) {
-                //Geld beim alten from wiederherstellen
-                state.localStorage.moneyAccounts[data.oldTransfer.fromIndex].money += data.oldTransfer.money;
-                //Umbuchung vom neuen from abrechnen
-                state.localStorage.moneyAccounts[data.fromIndex].money -= data.money;
-                //Geld vom alten to wieder abziehen
-                state.localStorage.moneyAccounts[data.oldTransfer.toIndex].money -= data.oldTransfer.money;
-                //Umbuchung auf das neue to rechnen
-                state.localStorage.moneyAccounts[data.toIndex].money += data.money;
+            //Geld beim alten from wiederherstellen
+            state.localStorage.moneyAccounts[data.oldTransfer.fromIndex].money += data.oldTransfer.money;
+            //Umbuchung vom neuen from abrechnen
+            state.localStorage.moneyAccounts[data.fromIndex].money -= data.money;
+            //to updaten
+            state.localStorage.moneyAccounts[data.toIndex].money += (newTransferMoney - data.oldTransfer.money);
 
-                //State und localStorage updaten
-                state.localStorage.transfers[data.item] = { name: data.name, description: data.description, money: data.money, from: data.from, to: data.to, date: data.date };
-                localStorage.setItem('state', JSON.stringify(state.localStorage));
-            }
-            //from hat sich geändert
-            else if(data.oldTransfer.from !== data.from) {
-                //Geld beim alten from wiederherstellen
-                state.localStorage.moneyAccounts[data.oldTransfer.fromIndex].money += data.oldTransfer.money;
-                //Umbuchung vom neuen from abrechnen
-                state.localStorage.moneyAccounts[data.fromIndex].money -= data.money;
-                //to updaten
-                state.localStorage.moneyAccounts[data.toIndex].money += (newTransferMoney - data.oldTransfer.money);
+            //State und localStorage updaten
+            state.localStorage.transfers[data.item] = { colorFrom: data.colorFrom, colorTo: data.colorTo, name: data.name, description: data.description, money: data.money, from: data.from, to: data.to, date: data.date };
+            localStorage.setItem('state', JSON.stringify(state.localStorage));
 
-                //State und localStorage updaten
-                state.localStorage.transfers[data.item] = { name: data.name, description: data.description, money: data.money, from: data.from, to: data.to, date: data.date };
-                localStorage.setItem('state', JSON.stringify(state.localStorage));
-            }
-            //to hat sich geändert
-            else {
-                console.log('to');
-                //Geld vom alten to wieder abziehen
-                state.localStorage.moneyAccounts[data.oldTransfer.toIndex].money -= data.oldTransfer.money;
-                //Umbuchung auf das neue to rechnen
-                state.localStorage.moneyAccounts[data.toIndex].money += data.money;
-                //from updaten
-                state.localStorage.moneyAccounts[data.fromIndex].money -= (newTransferMoney - data.oldTransfer.money);
 
-                //State und localStorage updaten
-                state.localStorage.transfers[data.item] = { name: data.name, description: data.description, money: data.money, from: data.from, to: data.to, date: data.date };
-                localStorage.setItem('state', JSON.stringify(state.localStorage));
-            }
+        },
+        saveEditedTransferWithNewTo(state, data) {
+            const newTransferMoney = data.money;
+
+            //Geld vom alten to wieder abziehen
+            state.localStorage.moneyAccounts[data.oldTransfer.toIndex].money -= data.oldTransfer.money;
+            //Umbuchung auf das neue to rechnen
+            state.localStorage.moneyAccounts[data.toIndex].money += data.money;
+            //from updaten
+            state.localStorage.moneyAccounts[data.fromIndex].money -= (newTransferMoney - data.oldTransfer.money);
+
+            //State und localStorage updaten
+            state.localStorage.transfers[data.item] = { colorFrom: data.colorFrom, colorTo: data.colorTo, name: data.name, description: data.description, money: data.money, from: data.from, to: data.to, date: data.date };
+            localStorage.setItem('state', JSON.stringify(state.localStorage));
+
         },
         deleteTransfer(state, data) {
             state.localStorage.moneyAccounts[data.fromIndex].money += data.money;

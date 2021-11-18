@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import SaveDelete from "@/components/moneyAccounts/buttons/SaveDelete";
+import SaveDelete from "@/components/buttons/SaveDelete";
 import InputColorPicker from 'vue-native-color-picker'
 export default {
   name: "MoneyAccountForm",
@@ -54,7 +54,7 @@ export default {
     ];
 
 
-    if (this.$route.params.item == 'new') {
+    if (this.$route.params.item === 'new') {
       return {
         new: true,
         name: '',

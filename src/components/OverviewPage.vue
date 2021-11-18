@@ -16,7 +16,7 @@
 <script>
 import DoughnutChart from "@/components/chart/DoughnutChart";
 import MoneyAccountsList from "@/components/moneyAccounts/page/MoneyAccountsList";
-import PlusMinus from "@/components/moneyAccounts/buttons/PlusMinus";
+import PlusMinus from "@/components/buttons/PlusMinus";
 export default {
   name: "OverviewPage",
   components: { DoughnutChart, MoneyAccountsList, PlusMinus },

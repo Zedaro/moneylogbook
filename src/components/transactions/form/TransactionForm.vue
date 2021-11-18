@@ -76,7 +76,7 @@
 </template>
 
 <script>
-import SaveDelete from "@/components/moneyAccounts/buttons/SaveDelete";
+import SaveDelete from "@/components/buttons/SaveDelete";
 export default {
   name: "TransactionForm",
   components: { SaveDelete },
@@ -168,6 +168,7 @@ export default {
         */
         const data = {
           item: this.$route.params.item,
+          color: this.$store.getters.getMoneyAccounts.find(account => account.name === this.moneyAccount).color,
           name: this.name,
           description: this.description,
           moneyAccount: this.moneyAccount,

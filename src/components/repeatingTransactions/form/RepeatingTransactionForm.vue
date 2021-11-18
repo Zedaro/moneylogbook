@@ -3,6 +3,7 @@
     <v-card>
       <v-form ref="transactionForm">
 
+        <!-- name -->
         <v-text-field counter="100"
                       label="Name"
                       maxlength="100"
@@ -10,6 +11,7 @@
                       :rules="this.nameRules"
         ></v-text-field>
 
+        <!-- description -->
         <v-textarea
             maxlength="1000"
             v-model="description"
@@ -21,6 +23,7 @@
           </template>
         </v-textarea>
 
+        <!-- moneyAccounts -->
         <v-select
             :items="items"
             label="Konto"
@@ -28,6 +31,7 @@
             :rules="selectRules"
         ></v-select>
 
+        <!-- money -->
         <v-text-field type="number"
                       label="Geld"
                       step="0.01"
@@ -36,6 +40,7 @@
                       :rules="this.moneyRules"
         ></v-text-field>
 
+        <!-- first date -->
         <v-menu
             v-model="menuStart"
             :close-on-content-click="false"
@@ -47,7 +52,7 @@
           <template v-slot:activator="{ on, attrs }">
             <v-text-field
                 v-model="computedStartingDateFormatted"
-                label="Start-Datum"
+                label="Erste Ausführung"
                 prepend-icon="mdi-calendar"
                 readonly
                 v-bind="attrs"
@@ -62,6 +67,131 @@
           ></v-date-picker>
         </v-menu>
 
+        <div class="rhythm-div">
+          <!-- rhythmNumber
+          <v-text-field type="number"
+                        :label="rhythmNumberLabel"
+                        step="1"
+                        min="1"
+                        max="12"
+                        v-model.number="rhythmNumber"
+                        :rules="this.rhythmNumberRules"
+          ></v-text-field>
+          -->
+          <v-menu
+              v-model="menuRhythmNumber"
+              :close-on-content-click="true"
+              :nudge-right="40"
+              transition="scale-transition"
+              offset-y
+              min-width="auto"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                  class="rhythm-number"
+                  :value="rhythmNumbers[rhythmNumberIndex]"
+                  label="Intervall"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+              ></v-text-field>
+            </template>
+            <v-list>
+              <v-list-item-group v-model="rhythmNumberIndex">
+                <v-list-item
+                    v-for="(item, index) in rhythmNumbers"
+                    :key="index"
+                >
+                  <v-list-item-title>{{ item }}</v-list-item-title>
+                </v-list-item>
+              </v-list-item-group>
+            </v-list>
+            <!--
+            <v-select
+                :items="rhythmNumbers"
+                value="Monat"
+                v-model="rhythmNumber"
+                :rules="this.rhythmTypeRules"
+            ></v-select>
+            -->
+          </v-menu>
+
+          <v-menu
+              v-model="menuRhythmType"
+              :close-on-content-click="true"
+              :nudge-right="40"
+              transition="scale-transition"
+              offset-y
+              min-width="auto"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                  class="rhythm-type"
+                  :value="rhythmTypes[rhythmTypeIndex]"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+              ></v-text-field>
+            </template>
+            <v-list>
+              <v-list-item-group v-model="rhythmTypeIndex">
+                <v-list-item
+                    v-for="(item, index) in rhythmTypes"
+                    :key="index"
+                >
+                  <v-list-item-title>{{ item }}</v-list-item-title>
+                </v-list-item>
+              </v-list-item-group>
+            </v-list>
+          </v-menu>
+          <!--
+          <v-select
+              :items="rhythmNumbers"
+              value="Monat"
+              v-model="rhythmNumber"
+              :rules="this.rhythmTypeRules"
+          ></v-select>
+          -->
+
+          <!-- rhythmType -->
+          <!--
+          <v-select
+              :items="rhythmTypes"
+              label="Rhythmus"
+              value="Monate"
+              v-model="rhythmType"
+              :rules="this.rhythmTypeRules"
+          ></v-select>
+          -->
+
+          <v-chip-group
+              v-if="rhythmTypeIndex === 0"
+              v-model="weekdayIndexes"
+              class="weekdays"
+              multiple
+              active-class="primary--text"
+          >
+            <v-chip
+                v-for="(day, index) in weekdays"
+                :key="index"
+            >
+              {{ day }}
+            </v-chip>
+          </v-chip-group>
+
+          <!--
+          <v-select
+              v-if="rhythmTypeIndex === 0"
+              :items="weekdays"
+              label="Rhythmus"
+              value="Monate"
+              v-model="weekdayIndexes"
+              :rules="this.rhythmTypeRules"
+          ></v-select>
+          -->
+        </div>
+
+        <!-- last date -->
         <v-menu
             v-model="menuEnd"
             :close-on-content-click="false"
@@ -73,7 +203,7 @@
           <template v-slot:activator="{ on, attrs }">
             <v-text-field
                 v-model="computedEndingDateFormatted"
-                label="End-Datum"
+                label="Letzte Ausführung"
                 prepend-icon="mdi-calendar"
                 readonly
                 v-bind="attrs"
@@ -102,7 +232,7 @@
 </template>
 
 <script>
-import SaveDelete from "@/components/moneyAccounts/buttons/SaveDelete";
+import SaveDelete from "@/components/buttons/SaveDelete";
 export default {
   name: "RepeatingTransactionForm",
   components: { SaveDelete },
@@ -117,6 +247,19 @@ export default {
     const selectRules = [
       v => !!v || "Geben Sie bitte ein Konto an"
     ];
+    const rhythmNumberRules = [
+      v => !!v || "Geben Sie bitte eine Zahl",
+      v => (v >= 1  &&  v <= 12) || "Geben Sie bitte eine Zahl zwischen 1 und 12 an"
+    ];
+    const rhythmTypeRules = [
+      v => !!v || "Geben Sie bitte einen Rhythmus an"
+    ];
+    /*const rhythmTypes = [
+        "Wochen",
+        "Monat",
+        "Jahre"
+    ]
+    */
 
 
     if (this.$route.params.item === 'new') {
@@ -127,15 +270,22 @@ export default {
         items: (this.$store.getters.getMoneyAccountNames),
         moneyAccount: '',
         money: null,
-        //color: '#000000',
+        rhythmNumberIndex: 0,
+        rhythmTypeIndex: 1,
+        weekdayIndexes: [],
+
         nameRules: nameRules,
         moneyRules: moneyRules,
         selectRules: selectRules,
+        rhythmNumberRules: rhythmNumberRules,
+        rhythmTypeRules: rhythmTypeRules,
 
         startingDate: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-        endingDate: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+        endingDate: '',//(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
         menuStart: false,
-        menuEnd: false
+        menuEnd: false,
+        menuRhythmNumber: false,
+        menuRhythmType: false
       };
     }
     else {
@@ -148,13 +298,19 @@ export default {
         money: (this.$store.getters.getTransactions[this.$route.params.item].money),
         startingDate: (this.$store.getters.getTransactions[this.$route.params.item].date),
         endingDate: (this.$store.getters.getTransactions[this.$route.params.item].date),
-        //color: (this.$store.getters.getMoneyAccounts[this.$route.params.item].color),
+        rhythmNumber: '',
+        rhythmType: '',
+        //rhythmTypes: rhythmTypes,
         nameRules: nameRules,
         moneyRules: moneyRules,
         selectRules: selectRules,
+        rhythmNumberRules: rhythmNumberRules,
+        rhythmTypeRules: rhythmTypeRules,
 
         menuStart: false,
-        menuEnd: false
+        menuEnd: false,
+        menuRhythmNumber: false,
+        menuRhythmType: false
       };
     }
 
@@ -172,11 +328,92 @@ export default {
 
   },
   computed: {
+    /*
+    rhythmNumberLabel() {
+      let word = "";
+      if(this.rhythmType === "Woche") {
+        word = "Jede ";
+      } else if(this.rhythmType === "Monat") {
+        word = "Jeden ";
+      } else if(this.rhythmType === "Jahr") {
+        word = "Jedes ";
+      } else {
+        word = "Alle ";
+      }
+      return word;
+      //return (this.rhythmNumber == 1) ? ;
+    },
+    */
+
+    rhythmNumbers() {
+      let every = "";
+      if(this.rhythmTypeIndex === 0) {
+        every = "Jede ";
+      } else if(this.rhythmTypeIndex === 1) {
+        every = "Jeden ";
+      } else if(this.rhythmTypeIndex === 2) {
+        every = "Jedes ";
+      }
+
+      const rhythmNumbers = [every];
+      for(let i = 2; i <= 12; i++) {
+        rhythmNumbers.push("Alle " + i);
+      }
+
+      //const rhythmNumbers = [1, 2, 3];
+      return rhythmNumbers;
+    },
+    /*
+    selectedRhythmNumberComputed() {
+      if(this.rhythmNumberIndex === 0) {
+        if(this.rhythmTypeIndex === 0) {
+          return "Jede";
+        } else if(this.rhythmTypeIndex === 1) {
+          return "Jeden";
+        } else {
+          return "Jedes";
+        }
+      } else {
+        return this.rhythmNumberItems[this.rhythmNumberIndex];
+      }
+    },
+    */
+    rhythmTypes() {
+      if(this.rhythmNumberIndex === 0) {
+        return [
+          "Woche",
+          "Monat",
+          "Jahr"
+        ];
+      } else {
+        return [
+          "Wochen",
+          "Monate",
+          "Jahre"
+        ];
+      }
+    },
+    /*
+    selectedRhythmTypeComputed() {
+
+
+      if(this.rhythmNumberIndex === 1) {
+        return "Jede";
+      } else if(this.rhythmTypeIndex === 2) {
+        return "Jeden";
+      } else {
+        return "Jedes";
+      }
+    },
+    */
+    weekdays() {
+      return ['MO', 'DI', 'MI', 'DO', 'FR', 'SA', 'SO'];
+    },
     computedStartingDateFormatted() {
       return this.formatDate(this.startingDate);
     },
     computedEndingDateFormatted() {
-      return this.formatDate(this.endingDate);
+      return (this.endingDate != '') ? this.formatDate(this.endingDate) : '';
     }
   },
   methods: {
@@ -199,16 +436,32 @@ export default {
           this.money = parseFloat(this.money);
         }
         */
+        /*
+        const rhythmNumbers = () => {
+          let arr = [];
+          for(let i=0; i < 12; i++) {
+            arr.push(i+1);
+          }
+          return arr;
+        };
+        */
+        const rhythmNumbers = [1, 2, 3];
+        const rhythmTypes = ['weekly', 'monthly', 'yearly'];
+
         const data = {
           item: this.$route.params.item,
+          color: this.$store.getters.getMoneyAccounts.find(account => account.name === this.moneyAccount).color,
           name: this.name,
           description: this.description,
           moneyAccount: this.moneyAccount,
           money: parseFloat(this.money.toFixed(2)),   //.replace(/\./g, ','),
-          date: this.date,
+          startingDate: this.startingDate,
+          endingDate: this.endingDate,
+          rhythmNumber: rhythmNumbers[this.rhythmNumberIndex],
+          rhythmType: rhythmTypes[this.rhythmTypeIndex]
           //color: this.color
         };
-        this.$store.dispatch('saveTransaction', data)
+        this.$store.dispatch('saveRepeatingTransaction', data)
             .then( () => {
               this.$store.dispatch('updateTotalMoney');
             })
@@ -216,8 +469,11 @@ export default {
               console.log(this.$store.getters.getLocalStorage);
             })
             */
+            .then( () => {
+              console.log(this.$store.getters.getLocalStorage);
+            })
             .then(() => {
-              this.$router.push({name: 'transactions'});
+              this.$router.push({name: 'repeatingTransactions'});
             });
       }
     },
@@ -257,9 +513,40 @@ export default {
 <style scoped>
 
 .v-card {
-  width: 50%;
+  width: 90%;
   margin: 50px auto 0 auto;
   padding: 2%;
+}
+
+.rhythm-div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.rhythm-number {
+  margin-right: 2.5%;
+}
+
+.rhythm-type {
+  margin-left: 2.5%;
+}
+
+@media only screen and (min-width: 768px) {
+  .v-card {
+    width: 50%;
+    margin: 50px auto 0 auto;
+    padding: 2%;
+  }
+
+  .rhythm-div {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .weekdays {
+    margin-left: 2.5%;
+  }
 }
 
 </style>

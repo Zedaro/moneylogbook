@@ -62,6 +62,9 @@ export default {
       //this.$store.dispatch("setDrawer");
       this.$store.dispatch("setDrawer");
     }
+  },
+  mounted() {
+    console.log(this.$data);
   }
 }
 </script>

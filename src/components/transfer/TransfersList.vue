@@ -1,7 +1,7 @@
 <template>
   <div>
     <transfer-item v-for="(transfer, index) in this.$store.getters.getTransfers" :key="index"
-                      :name="transfer.name" :description="transfer.description" :money="transfer.money" :from="transfer.from" :to="transfer.to" :date="transfer.date" :index="index">
+                      :colorFrom="transfer.colorFrom" :colorTo="transfer.colorTo" :name="transfer.name" :description="transfer.description" :money="transfer.money" :from="transfer.from" :to="transfer.to" :date="transfer.date" :index="index">
     </transfer-item>
   </div>
 </template>

@@ -1,8 +1,8 @@
 <template>
 
-  <v-card width="50%" :to="item">
-    <div class="color" :style="{ backgroundColor: colorFrom }"></div>
-    <div class="color" :style="{ backgroundColor: colorTo }"></div>
+  <v-card width="50%" :to="moneyAccountsExist ? item : ''">
+    <div class="colorFrom" :style="{ backgroundColor: colorFrom }"></div>
+    <div class="colorTo" :style="{ backgroundColor: colorTo }"></div>
     <v-card-title class="card-title">{{ this.name }}</v-card-title>
     <v-card-text class="text-center grey--text">{{ this.description }}</v-card-text>
     <v-card-text class="text-center subtitle-1 money">{{ new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(this.money) }}</v-card-text>
@@ -18,21 +18,19 @@
 <script>
 export default {
   name: "TransferItem",
-  props: ['name', 'description', 'money', 'from', 'to', 'date', 'index'],
+  props: ['colorFrom', 'colorTo', 'name', 'description', 'money', 'from', 'to', 'date', 'index'],
   computed: {
+    moneyAccountsExist() {
+      const accountFrom = this.$store.getters.getMoneyAccounts.find(account => account.name === this.from);
+      const accountTo = this.$store.getters.getMoneyAccounts.find(account => account.name === this.to);
+
+      return (typeof accountFrom != 'undefined'  &&  typeof accountTo != 'undefined');
+    },
     item() {
       return {
         name: 'transferForm',
         params: { item: this.index }
       };
-    },
-    colorFrom() {
-      const account = this.$store.getters.getMoneyAccounts.find(account => account.name === this.from);
-      return account.color;
-    },
-    colorTo() {
-      const account = this.$store.getters.getMoneyAccounts.find(account => account.name === this.to);
-      return account.color;
     },
     formattedDate() {
       const [year, month, day] = this.date.split('-');
@@ -50,11 +48,19 @@ export default {
   margin: auto;
 }
 
-.color {
+.colorFrom {
   position: absolute;
   width: 2.5%;
   height: 100%;
-  background-color: pink;
+  /*background-color: pink;*/
+}
+
+.colorTo {
+  position: absolute;
+  left: 97.5%;
+  width: 2.5%;
+  height: 100%;
+  /*background-color: pink;*/
 }
 
 .v-card__title {

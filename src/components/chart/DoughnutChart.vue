@@ -118,8 +118,19 @@ export default {
         data: [],
         backgroundColor: [],
         datalabels: {
-          formatter: function(value) {
-            return ( (value/totalMoney) * 100 ).toFixed(2).replace(/\./g, ',') + '%';
+          labels: {
+            percentage: {
+              align: 'top',
+              formatter: function(value) {
+                return ( (value/totalMoney) * 100 ).toFixed(2).replace(/\./g, ',') + '%';
+              }
+            },
+            money: {
+              align: 'bottom',
+              formatter: function(value) {
+                return value + '€';
+              }
+            },
           },
           color: 'black'
         },
