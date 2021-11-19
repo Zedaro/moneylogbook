@@ -203,7 +203,7 @@
           <template v-slot:activator="{ on, attrs }">
             <v-text-field
                 v-model="computedEndingDateFormatted"
-                label="Letzte Ausführung"
+                label="Letzte Ausführung / Enddatum"
                 prepend-icon="mdi-calendar"
                 readonly
                 v-bind="attrs"
@@ -262,6 +262,8 @@ export default {
     */
 
 
+    const weekdays = ['MO', 'DI', 'MI', 'DO', 'FR', 'SA', 'SO'];
+
     if (this.$route.params.item === 'new') {
       return {
         new: true,
@@ -272,6 +274,7 @@ export default {
         money: null,
         rhythmNumberIndex: 0,
         rhythmTypeIndex: 1,
+        weekdays: weekdays,
         weekdayIndexes: [],
 
         nameRules: nameRules,
@@ -282,6 +285,7 @@ export default {
 
         startingDate: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
         endingDate: '',//(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+
         menuStart: false,
         menuEnd: false,
         menuRhythmNumber: false,
@@ -289,18 +293,41 @@ export default {
       };
     }
     else {
+      //rhythmTypeIndex bestimmen
+      const rhythmType = this.$store.getters.getRepeatingTransactions[this.$route.params.item].rhythmType;
+      let rhythmTypeIndex = null;
+      if(rhythmType === 'weekly') {
+        rhythmTypeIndex = 0;
+      } else if(rhythmType === 'monthly') {
+        rhythmTypeIndex = 1;
+      } else {
+        rhythmTypeIndex = 2;
+      }
+
+      const selectedWeekdays = this.$store.getters.getRepeatingTransactions[this.$route.params.item].weekdays;
+      let weekdayIndexes = []
+      if(selectedWeekdays != null) {
+        for(let i=0; i < selectedWeekdays.length; i++) {
+          weekdayIndexes.push(weekdays.findIndex( (weekday) => weekday == selectedWeekdays[i] ));
+        }
+      }
+
       return {
         new: false,
-        name: (this.$store.getters.getTransactions[this.$route.params.item].name),
-        description: (this.$store.getters.getTransactions[this.$route.params.item].description),
+        name: (this.$store.getters.getRepeatingTransactions[this.$route.params.item].name),
+        description: (this.$store.getters.getRepeatingTransactions[this.$route.params.item].description),
         items: (this.$store.getters.getMoneyAccountNames),
-        moneyAccount: (this.$store.getters.getTransactions[this.$route.params.item].moneyAccount),
-        money: (this.$store.getters.getTransactions[this.$route.params.item].money),
-        startingDate: (this.$store.getters.getTransactions[this.$route.params.item].date),
-        endingDate: (this.$store.getters.getTransactions[this.$route.params.item].date),
-        rhythmNumber: '',
-        rhythmType: '',
+        moneyAccount: (this.$store.getters.getRepeatingTransactions[this.$route.params.item].moneyAccount),
+        money: (this.$store.getters.getRepeatingTransactions[this.$route.params.item].money),
+        startingDate: (this.$store.getters.getRepeatingTransactions[this.$route.params.item].startingDate),
+        endingDate: (this.$store.getters.getRepeatingTransactions[this.$route.params.item].endingDate),
+
+        rhythmNumberIndex: (this.$store.getters.getRepeatingTransactions[this.$route.params.item].rhythmNumber - 1),
+        rhythmTypeIndex: rhythmTypeIndex,
+        weekdays: weekdays,
+        weekdayIndexes: weekdayIndexes,
         //rhythmTypes: rhythmTypes,
+
         nameRules: nameRules,
         moneyRules: moneyRules,
         selectRules: selectRules,
@@ -357,7 +384,7 @@ export default {
 
       const rhythmNumbers = [every];
       for(let i = 2; i <= 12; i++) {
-        rhythmNumbers.push("Alle " + i);
+        rhythmNumbers.push("Alle " + i + ' ');
       }
 
       //const rhythmNumbers = [1, 2, 3];
@@ -406,9 +433,11 @@ export default {
       }
     },
     */
+    /*
     weekdays() {
       return ['MO', 'DI', 'MI', 'DO', 'FR', 'SA', 'SO'];
     },
+    */
     computedStartingDateFormatted() {
       return this.formatDate(this.startingDate);
     },
@@ -445,8 +474,18 @@ export default {
           return arr;
         };
         */
-        const rhythmNumbers = [1, 2, 3];
+
+        let rhythmNumbers = [];
+        for(let i=0; i < 12; i++) {
+          rhythmNumbers.push(i+1);
+        }
+
         const rhythmTypes = ['weekly', 'monthly', 'yearly'];
+
+        let weekdays = [];
+        for(let i=0; i < this.weekdayIndexes.length; i++) {
+          weekdays.push(this.weekdays[this.weekdayIndexes[i]]);
+        }
 
         const data = {
           item: this.$route.params.item,
@@ -458,20 +497,15 @@ export default {
           startingDate: this.startingDate,
           endingDate: this.endingDate,
           rhythmNumber: rhythmNumbers[this.rhythmNumberIndex],
-          rhythmType: rhythmTypes[this.rhythmTypeIndex]
+          rhythmType: rhythmTypes[this.rhythmTypeIndex],
+          weekdays: (this.weekdayIndexes.length == 0) ? null : weekdays,
+          rhythmText: this.rhythmNumbers[this.rhythmNumberIndex] + this.rhythmTypes[this.rhythmTypeIndex]
           //color: this.color
         };
+
+        console.log(weekdays);
+
         this.$store.dispatch('saveRepeatingTransaction', data)
-            .then( () => {
-              this.$store.dispatch('updateTotalMoney');
-            })
-            /*.then( () => {
-              console.log(this.$store.getters.getLocalStorage);
-            })
-            */
-            .then( () => {
-              console.log(this.$store.getters.getLocalStorage);
-            })
             .then(() => {
               this.$router.push({name: 'repeatingTransactions'});
             });
@@ -479,21 +513,12 @@ export default {
     },
     deleteData() {
       const data = {
-        item: this.$route.params.item,
-        name: this.name,
-        description: this.description,
-        moneyAccount: this.moneyAccount,
-        money: parseFloat(this.money.toFixed(2)),   //.replace(/\./g, ','),
-        date: this.date,
-        //color: this.color
+        item: this.$route.params.item
       };
 
-      this.$store.dispatch('deleteTransaction', data)
-          .then( () => {
-            this.$store.dispatch('updateTotalMoney');
-          })
+      this.$store.dispatch('deleteRepeatingTransaction', data)
           .then(() => {
-            this.$router.push({name: 'transactions'});
+            this.$router.push({name: 'repeatingTransactions'});
           });
     }
   },

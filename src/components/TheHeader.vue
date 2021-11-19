@@ -4,7 +4,7 @@
     <v-app-bar-nav-icon v-else @click="$router.back()">
       <v-icon>mdi-arrow-left</v-icon></v-app-bar-nav-icon>
     <v-toolbar-title>{{ toolbarTitle }}</v-toolbar-title>
-    <!-- <button @click="test">Test</button> -->
+     <!-- <button @click="test">Test</button> -->
     <button class="newLocalStorageButton" @click="newLocalStorage">Reset localStorage</button>
   </v-app-bar>
 </template>
@@ -53,7 +53,7 @@ export default {
       this.$store.dispatch("setDrawer");
     },
     test() {
-      console.log(this.$router);
+      //console.log();
     },
     newLocalStorage() {
       this.$store.dispatch('setLocalStorage', true);

@@ -42,7 +42,9 @@ export const store = new Vuex.Store({
                         startingDate: '2021-11-20',
                         endingDate: '2021-12-20',
                         rhythmNumber: 1,
-                        rhythmType: 'monthly'
+                        rhythmType: 'monthly',
+                        weekdays: null,
+                        rhythmText: 'Jeden Monat'
                     }
                 ],
                 transfers: [
@@ -116,6 +118,9 @@ export const store = new Vuex.Store({
         getTransactions(state) {
             return state.localStorage.transactions;
         },
+        getRepeatingTransactions(state) {
+            return state.localStorage.repeatingTransactions;
+        },
         getTransfers(state) {
             return state.localStorage.transfers;
         }
@@ -188,6 +193,7 @@ export const store = new Vuex.Store({
                 context.commit('saveNewRepeatingTransaction', data);
             } else {
                 //hol dir alte und neue Transaktion. Vergleiche die moneyAccount Einträge
+                /*
                 const oldTransaction = context.state.localStorage.transactions[data.item];
                 data.oldTransaction = oldTransaction;
                 if(oldTransaction.moneyAccount === data.moneyAccount) {
@@ -196,7 +202,12 @@ export const store = new Vuex.Store({
                     data.oldAccountIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === oldTransaction.moneyAccount);
                     context.commit('saveEditedTransactionWithNewMoneyAccount', data);
                 }
+                */
+                context.commit('saveEditedRepeatingTransaction', data);
             }
+        },
+        deleteRepeatingTransaction(context, data) {
+            context.commit('deleteRepeatingTransaction', data);
         },
 
         saveTransfer(context, data) {
@@ -310,8 +321,17 @@ export const store = new Vuex.Store({
         },
 
         saveNewRepeatingTransaction(state, data) {
-            state.localStorage.repeatingTransactions.push({ color: data.color, name: data.name, description: data.description, money: data.money, moneyAccount: data.moneyAccount, startingDate: data.startingDate, endingDate: data.endingDate, rhythmNumber: data.rhythmNumber, rhythmType: data.rhythmType });
+            state.localStorage.repeatingTransactions.push({ color: data.color, name: data.name, description: data.description, money: data.money, moneyAccount: data.moneyAccount, startingDate: data.startingDate, endingDate: data.endingDate, rhythmNumber: data.rhythmNumber, rhythmType: data.rhythmType, weekdays: data.weekdays, rhythmText: data.rhythmText });
             //state.localStorage.moneyAccounts[data.accountIndex].money += data.money;
+            localStorage.setItem('state', JSON.stringify(state.localStorage));
+            //console.log(state.localStorage.repeatingTransactions);
+        },
+        saveEditedRepeatingTransaction(state, data) {
+            state.localStorage.repeatingTransactions[data.item] = { color: data.color, name: data.name, description: data.description, money: data.money, moneyAccount: data.moneyAccount, startingDate: data.startingDate, endingDate: data.endingDate, rhythmNumber: data.rhythmNumber, rhythmType: data.rhythmType, weekdays: data.weekdays, rhythmText: data.rhythmText };
+            localStorage.setItem('state', JSON.stringify(state.localStorage));
+        },
+        deleteRepeatingTransaction(state, data) {
+            state.localStorage.repeatingTransactions.splice(data.item, 1);
             localStorage.setItem('state', JSON.stringify(state.localStorage));
         },
 
