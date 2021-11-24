@@ -1,34 +1,41 @@
 <template>
   <div>
     <v-card>
-      <v-form ref="moneyAccountForm">
-        <v-text-field counter="100"
-                      label="Name"
-                      maxlength="100"
-                      v-model="name"
-                      :rules="this.nameRules"
-        ></v-text-field>
-        <v-text-field type="number"
-                      label="Geld"
-                      step="0.01"
-                      prefix="€"
-                      v-model.number="money"
-                      :rules="this.moneyRules"
-        ></v-text-field>
 
-        <v-input-colorpicker v-model="color" />
+      <validation-observer v-slot="{ handleSubmit }">
+        <v-form ref="moneyAccountForm" @submit.prevent="handleSubmit(saveData)">
 
-        <!--
-        <v-color-picker mode="hexa"
-                        v-model="color">
-        </v-color-picker>
-        -->
+          <!-- name -->
+          <validation-provider rules="required|regex" v-slot="{ errors }">
+            <v-text-field counter="100"
+                        label="Name"
+                        maxlength="100"
+                        v-model="name"
+                        :error-messages="errors"
+          ></v-text-field>
+          </validation-provider>
 
-        <save-delete @saveData="saveData"
-                     @deleteData="deleteData"
-        ></save-delete>
-          <!-- <edit-money-account v-else></edit-money-account> -->
-      </v-form>
+          <!-- money -->
+          <validation-provider rules="required|double|zero_or_positive" v-slot="{ errors }">
+            <v-text-field type="number"
+                        label="Geld"
+                        step="0.01"
+                        prefix="€"
+                        v-model.number="money"
+                        :error-messages="errors"
+          ></v-text-field>
+          </validation-provider>
+
+          <!-- color -->
+          <validation-provider rules="required" v-slot="{ errors }">
+            <v-input-colorpicker v-model="color" :error-messages="errors" />
+          </validation-provider>
+
+          <save-delete @deleteData="deleteData"></save-delete>
+
+        </v-form>
+      </validation-observer>
+
     </v-card>
 
     <button @click="test">Test</button>
@@ -38,10 +45,13 @@
 
 <script>
 import SaveDelete from "@/components/buttons/SaveDelete";
-import InputColorPicker from 'vue-native-color-picker'
+import InputColorPicker from 'vue-native-color-picker';
+import { ValidationObserver, ValidationProvider } from 'vee-validate';
+import '../../../ValidationRules/validationRules';
+
 export default {
   name: "MoneyAccountForm",
-  components: { SaveDelete, "v-input-colorpicker": InputColorPicker },
+  components: { SaveDelete, "v-input-colorpicker": InputColorPicker, ValidationObserver, ValidationProvider },
   data() {
 
     // eslint-disable-next-line no-unused-vars
@@ -99,26 +109,24 @@ export default {
     },
     saveData() {
       //console.log(this.accountData);
-      if(this.$refs.moneyAccountForm.validate()) {
-        /*
+      /*
         if(typeof this.money == 'string') {
           this.money = parseFloat(this.money);
         }
         */
-        const data = {
-          item: this.$route.params.item,
-          name: this.name,
-          money: parseFloat(this.money.toFixed(2)),   //.replace(/\./g, ','),
-          color: this.color
-        };
-        this.$store.dispatch('saveMoneyAccount', data)
-            .then( () => {
-              this.$store.dispatch('updateTotalMoney');
-            })
-            .then(() => {
-              this.$router.push({name: 'overview'});
-            });
-      }
+      const data = {
+        item: this.$route.params.item,
+        name: this.name,
+        money: parseFloat(this.money.toFixed(2)),   //.replace(/\./g, ','),
+        color: this.color
+      };
+      this.$store.dispatch('saveMoneyAccount', data)
+          .then( () => {
+            this.$store.dispatch('updateTotalMoney');
+          })
+          .then(() => {
+            this.$router.push({name: 'overview'});
+          });
     },
     deleteData() {
       this.$store.dispatch('deleteMoneyAccount', { item: this.$route.params.item })

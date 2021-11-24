@@ -1,87 +1,121 @@
 <template>
   <div>
-    <v-card>
-      <v-form ref="transferForm">
 
-        <!--  -->
-        <v-text-field counter="100"
-                      label="Name"
-                      maxlength="100"
-                      v-model="name"
-                      :rules="this.nameRules"
-        ></v-text-field>
+    <v-dialog v-model="dialog" max-width="25%">
+      <v-card>
+        <v-card-title class="text-h5">
+          Fehler
+        </v-card-title>
+        <v-card-text>
+          {{ dialogText }}
+        </v-card-text>
+      </v-card>
+    </v-dialog>
 
-        <!--  -->
-        <v-textarea
-            maxlength="1000"
-            v-model="description"
-        >
-          <template v-slot:label>
-            <div>
-              Beschreibung <small>(optional)</small>
-            </div>
-          </template>
-        </v-textarea>
+    <validation-test></validation-test>
 
-        <!--  -->
-        <v-select
-            ref="from"
-            :items="selectItems"
-            label="Von"
-            v-model="from"
-            :rules="fromRules"
-        ></v-select>
+    <v-card class="form-card">
 
-        <!--  -->
-        <v-select
-            ref="to"
-            :items="selectItems"
-            label="Zu"
-            v-model="to"
-            :rules="toRules"
-        ></v-select>
+      <validation-observer v-slot="{ handleSubmit }">
+        <v-form ref="transferForm" @submit.prevent="handleSubmit(saveData)">
 
-        <!--  -->
-        <v-text-field type="number"
-                      label="Geld"
-                      step="0.01"
-                      prefix="€"
-                      v-model.number="money"
-                      :rules="this.moneyRules"
-        ></v-text-field>
-
-        <v-menu
-            v-model="menu"
-            :close-on-content-click="false"
-            :nudge-right="40"
-            transition="scale-transition"
-            offset-y
-            min-width="auto"
-        >
-          <template v-slot:activator="{ on, attrs }">
-            <v-text-field
-                v-model="computedDateFormatted"
-                label="Datum"
-                prepend-icon="mdi-calendar"
-                readonly
-                v-bind="attrs"
-                v-on="on"
+          <!-- name -->
+          <validation-provider :rules="{required: true, regex: true}" v-slot="{ errors }">
+            <v-text-field counter="100"
+                          label="Name"
+                          maxlength="100"
+                          v-model="name"
+                          :error-messages="errors"
             ></v-text-field>
-          </template>
-          <v-date-picker
-              v-model="date"
-              no-title
-              scrollable
-              @input="menu = false"
-          ></v-date-picker>
-        </v-menu>
+          </validation-provider>
 
-        <save-delete @saveData="saveData"
-                     @deleteData="deleteData"
-        ></save-delete>
-        <!-- <edit-money-account v-else></edit-money-account> -->
+          <!-- description -->
+          <validation-provider :rules="{regex: true}" v-slot="{ errors }">
+            <v-textarea
+                maxlength="1000"
+                v-model="description"
+                :error-messages="errors"
+            >
+              <template v-slot:label>
+                <div>
+                  Beschreibung <small>(optional)</small>
+                </div>
+              </template>
+            </v-textarea>
+          </validation-provider>
 
-      </v-form>
+          <!-- from -->
+          <validation-provider name="from" rules="required|twoDifferentMoneyAccounts:@to" v-slot="{ errors }">
+            <v-select
+                ref="from"
+                :items="selectItems"
+                label="Von"
+                v-model="from"
+                :error-messages="errors"
+            ></v-select>
+          </validation-provider>
+
+          <!-- to -->
+          <validation-provider name="to" rules="required|twoDifferentMoneyAccounts:@from" v-slot="{ errors }">
+            <v-select
+                ref="to"
+                :items="selectItems"
+                label="Zu"
+                v-model="to"
+                :error-messages="errors"
+            ></v-select>
+          </validation-provider>
+
+          <!-- money -->
+          <validation-provider rules="required|double|positiveFigure" v-slot="{ errors }">
+            <v-text-field type="number"
+                          label="Geld"
+                          step="0.01"
+                          prefix="€"
+                          v-model.number="money"
+                          :error-messages="errors"
+            ></v-text-field>
+          </validation-provider>
+
+          <!-- date -->
+          <validation-provider rules="required" v-slot="{ errors }">
+            <v-menu
+                v-model="menu"
+                :close-on-content-click="false"
+                :nudge-right="40"
+                transition="scale-transition"
+                offset-y
+                min-width="auto"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                    v-model="computedDateFormatted"
+                    label="Datum"
+                    prepend-icon="mdi-calendar"
+                    readonly
+                    v-bind="attrs"
+                    v-on="on"
+                    :error-messages="errors"
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                  v-model="date"
+                  no-title
+                  scrollable
+                  @input="menu = false"
+              ></v-date-picker>
+            </v-menu>
+          </validation-provider>
+
+
+          <save-delete @saveData="saveData"
+                       @deleteData="deleteData"
+          ></save-delete>
+          <!-- <edit-money-account v-else></edit-money-account> -->
+
+        </v-form>
+      </validation-observer>
+
     </v-card>
 
     <button @click="test">Test</button>
@@ -90,10 +124,16 @@
 </template>
 
 <script>
+import ValidationTest from "@/components/ValidationTest";
 import SaveDelete from "@/components/buttons/SaveDelete";
+import { ValidationObserver, ValidationProvider } from 'vee-validate';
+import '../../ValidationRules/validationRules';
+
+
+
 export default {
   name: "TransferForm",
-  components: { SaveDelete },
+  components: { SaveDelete, ValidationObserver, ValidationProvider, ValidationTest },
   data() {
     /*
     const nameRules = [
@@ -153,8 +193,11 @@ export default {
       to: (newForm) ? ('') : (transfers.to),
       money: (newForm) ? (null) : (transfers.money),
       date: (newForm) ? (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10) : (transfers.date),
-
       selectItems: (this.$store.getters.getMoneyAccountNames),
+
+      menu: false,
+      dialog: false,
+      dialogText: ''
       /*
       name: '',
       description: '',
@@ -164,6 +207,9 @@ export default {
       money: null,
       date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
       */
+
+      //<editor-fold desc="Rules">
+      /*
       nameRules: [
         v => !!v || "Geben Sie bitte einen Namen an"
       ],
@@ -195,7 +241,10 @@ export default {
           }
         }
       ],
-      menu: false
+      */
+      //</editor-fold>
+
+
     };
 
 
@@ -272,32 +321,38 @@ export default {
       return `${day}.${month}.${year}`;
     },
     saveData() {
-      if(this.$refs.transferForm.validate()) {
-        /*
-        if(typeof this.money == 'string') {
-          this.money = parseFloat(this.money);
-        }
-        */
-        const data = {
-          item: this.$route.params.item,
-          colorFrom: this.$store.getters.getMoneyAccounts.find(account => account.name === this.from).color,
-          colorTo: this.$store.getters.getMoneyAccounts.find(account => account.name === this.to).color,
-          name: this.name,
-          description: this.description,
-          from: this.from,
-          to: this.to,
-          money: parseFloat(this.money.toFixed(2)),   //.replace(/\./g, ','),
-          date: this.date
-        };
-        this.$store.dispatch('saveTransfer', data)
-            /*.then( () => {
-              console.log(this.$store.getters.getLocalStorage);
-            })
-            */
-            .then(() => {
-              this.$router.push({name: 'transfers'});
-            });
+      /*
+      if(typeof this.money == 'string') {
+        this.money = parseFloat(this.money);
       }
+      */
+
+      const data = {
+        item: this.$route.params.item,
+        colorFrom: this.$store.getters.getMoneyAccounts.find(account => account.name === this.from).color,
+        colorTo: this.$store.getters.getMoneyAccounts.find(account => account.name === this.to).color,
+        name: this.name,
+        description: this.description,
+        from: this.from,
+        to: this.to,
+        money: parseFloat(this.money.toFixed(2)),   //.replace(/\./g, ','),
+        date: this.date
+      };
+      this.$store.dispatch('saveTransfer', data)
+          .then((dialogText) => {
+            if(dialogText !== undefined) {
+              this.dialogText = dialogText;
+              this.dialog = true;
+            } else {
+              this.$router.push({name: 'transfers'});
+            }
+          })
+          /*
+          .then(() => {
+            this.$router.push({name: 'transfers'});
+          });
+          */
+
     },
     deleteData() {
       const data = {
@@ -332,7 +387,7 @@ export default {
 
 <style scoped>
 
-.v-card {
+.form-card {
   width: 50%;
   margin: 50px auto 0 auto;
   padding: 2%;

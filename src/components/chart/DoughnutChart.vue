@@ -128,7 +128,7 @@ export default {
             money: {
               align: 'bottom',
               formatter: function(value) {
-                return value + '€';
+                return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(value);
               }
             },
           },

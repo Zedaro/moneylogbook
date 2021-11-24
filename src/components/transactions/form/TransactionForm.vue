@@ -1,73 +1,104 @@
 <template>
   <div>
-    <v-card>
-      <v-form ref="transactionForm">
 
-        <v-text-field counter="100"
-                      label="Name"
-                      maxlength="100"
-                      v-model="name"
-                      :rules="this.nameRules"
-        ></v-text-field>
+    <v-dialog v-model="dialog" max-width="25%">
+      <v-card>
+        <v-card-title class="text-h5">
+          Fehler
+        </v-card-title>
+        <v-card-text>
+          {{ dialogText }}
+        </v-card-text>
+      </v-card>
+    </v-dialog>
 
-        <v-textarea
-            maxlength="1000"
-            v-model="description"
-        >
-          <template v-slot:label>
-            <div>
-              Beschreibung <small>(optional)</small>
-            </div>
-          </template>
-        </v-textarea>
+    <v-card class="form-card">
 
-        <v-select
-            :items="items"
-            label="Konto"
-            v-model="moneyAccount"
-            :rules="selectRules"
-        ></v-select>
+      <validation-observer v-slot="{ handleSubmit }">
+        <v-form ref="transactionForm" @submit.prevent="handleSubmit(saveData)">
 
-        <v-text-field type="number"
-                      label="Geld"
-                      step="0.01"
-                      prefix="€"
-                      v-model.number="money"
-                      :rules="this.moneyRules"
-        ></v-text-field>
+          <!-- name -->
+          <validation-provider rules="required|regex" v-slot="{ errors }">
+            <v-text-field counter="100"
+                        label="Name"
+                        maxlength="100"
+                        v-model="name"
+                        :error-messages="errors"
+          ></v-text-field>
+          </validation-provider>
 
-        <v-menu
-            v-model="menu"
-            :close-on-content-click="false"
-            :nudge-right="40"
-            transition="scale-transition"
-            offset-y
-            min-width="auto"
-        >
-          <template v-slot:activator="{ on, attrs }">
-            <v-text-field
-                v-model="computedDateFormatted"
-                label="Datum"
-                prepend-icon="mdi-calendar"
-                readonly
-                v-bind="attrs"
-                v-on="on"
-            ></v-text-field>
-          </template>
-          <v-date-picker
-              v-model="date"
-              no-title
-              scrollable
-              @input="menu = false"
-          ></v-date-picker>
-        </v-menu>
+          <!-- description -->
+          <validation-provider rules="regex" v-slot="{ errors }">
+            <v-textarea
+              maxlength="1000"
+              v-model="description"
+              :error-messages="errors"
+          >
+            <template v-slot:label>
+              <div>
+                Beschreibung <small>(optional)</small>
+              </div>
+            </template>
+          </v-textarea>
+          </validation-provider>
 
-        <save-delete @saveData="saveData"
-                     @deleteData="deleteData"
-        ></save-delete>
-        <!-- <edit-money-account v-else></edit-money-account> -->
+          <!-- moneyAccount -->
+          <validation-provider rules="required" v-slot="{ errors }">
+            <v-select
+              :items="items"
+              label="Konto"
+              v-model="moneyAccount"
+              :error-messages="errors"
+          ></v-select>
+          </validation-provider>
 
-      </v-form>
+          <!-- money -->
+          <validation-provider rules="required|not_zero" v-slot="{ errors }">
+            <v-text-field type="number"
+                        label="Geld"
+                        step="0.01"
+                        prefix="€"
+                        v-model.number="money"
+                        :error-messages="errors"
+          ></v-text-field>
+          </validation-provider>
+
+          <!-- date -->
+          <validation-provider rules="required" v-slot="{ errors }">
+            <v-menu
+              v-model="menu"
+              :close-on-content-click="false"
+              :nudge-right="40"
+              transition="scale-transition"
+              offset-y
+              min-width="auto"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                  v-model="computedDateFormatted"
+                  label="Datum"
+                  prepend-icon="mdi-calendar"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                  :error-messages="errors"
+              ></v-text-field>
+            </template>
+            <v-date-picker
+                v-model="date"
+                no-title
+                scrollable
+                @input="menu = false"
+            ></v-date-picker>
+          </v-menu>
+          </validation-provider>
+
+          <save-delete @deleteData="deleteData"></save-delete>
+          <!-- <edit-money-account v-else></edit-money-account> -->
+
+        </v-form>
+      </validation-observer>
+
     </v-card>
 
     <button @click="test">Test</button>
@@ -77,9 +108,12 @@
 
 <script>
 import SaveDelete from "@/components/buttons/SaveDelete";
+import { ValidationObserver, ValidationProvider } from 'vee-validate';
+import '../../../ValidationRules/validationRules';
+
 export default {
   name: "TransactionForm",
-  components: { SaveDelete },
+  components: { SaveDelete, ValidationObserver, ValidationProvider },
   data() {
 
     const nameRules = [
@@ -107,7 +141,9 @@ export default {
         selectRules: selectRules,
 
         date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-        menu: false
+        menu: false,
+        dialog: false,
+        dialogText: ''
       };
     }
     else {
@@ -124,7 +160,9 @@ export default {
         moneyRules: moneyRules,
         selectRules: selectRules,
 
-        menu: false
+        menu: false,
+        dialog: false,
+        dialogText: ''
       };
     }
 
@@ -160,12 +198,23 @@ export default {
       return `${day}.${month}.${year}`;
     },
     saveData() {
-      if(this.$refs.transactionForm.validate()) {
-        /*
-        if(typeof this.money == 'string') {
-          this.money = parseFloat(this.money);
-        }
-        */
+      /*
+      if(typeof this.money == 'string') {
+        this.money = parseFloat(this.money);
+      }
+      */
+
+      const balance = this.$store.getters.getMoneyAccounts.find(account => account.name === this.moneyAccount).money;
+      //const oldTransaction = this.$store.getters.getTransactions[this.$route.params.item].money;
+      const newBalance = parseFloat( ( balance + this.money ).toFixed(2) )
+
+      //If the new balance would be negative, open the warning dialog
+      if( newBalance < 0) {
+        this.dialogText = "Wenn Sie diese Transaktion durchführen würden, würde der Kontostand negativ werden. Bitte geben Sie einen anderen Geldbetrag an.";
+        this.dialog = true;
+      }
+      //else save the transaction
+      else {
         const data = {
           item: this.$route.params.item,
           color: this.$store.getters.getMoneyAccounts.find(account => account.name === this.moneyAccount).color,
@@ -190,23 +239,35 @@ export default {
       }
     },
     deleteData() {
-      const data = {
-        item: this.$route.params.item,
-        name: this.name,
-        description: this.description,
-        moneyAccount: this.moneyAccount,
-        money: parseFloat(this.money.toFixed(2)),   //.replace(/\./g, ','),
-        date: this.date,
-        //color: this.color
-      };
 
-      this.$store.dispatch('deleteTransaction', data)
-          .then( () => {
-            this.$store.dispatch('updateTotalMoney');
-          })
-          .then(() => {
-            this.$router.push({name: 'transactions'});
-          });
+      const balance = this.$store.getters.getMoneyAccounts.find(account => account.name === this.moneyAccount).money;
+      const newBalance = parseFloat( ( balance - this.money ).toFixed(2) )
+
+      //If the new balance would be negative, open the warning dialog
+      if( newBalance < 0) {
+        this.dialogText = "Wenn Sie diese Transaktion löschen würden, würde der Kontostand negativ werden.";
+        this.dialog = true;
+      }
+      //else delete the transaction
+      else {
+        const data = {
+          item: this.$route.params.item,
+          name: this.name,
+          description: this.description,
+          moneyAccount: this.moneyAccount,
+          money: parseFloat(this.money.toFixed(2)),   //.replace(/\./g, ','),
+          date: this.date,
+          //color: this.color
+        };
+
+        this.$store.dispatch('deleteTransaction', data)
+            .then( () => {
+              this.$store.dispatch('updateTotalMoney');
+            })
+            .then(() => {
+              this.$router.push({name: 'transactions'});
+            });
+      }
     }
   },
   /*
@@ -224,7 +285,7 @@ export default {
 
 <style scoped>
 
-.v-card {
+.form-card {
   width: 50%;
   margin: 50px auto 0 auto;
   padding: 2%;

@@ -13,13 +13,18 @@ export const store = new Vuex.Store({
                 moneyAccounts: [
                     {
                         name: 'Sparkasse',
-                        money: 1010,
+                        money: 1010.0,
                         color: "#EA0A8E"
                     },
                     {
                         name: 'ING DiBa',
-                        money: 2000,
+                        money: 2000.0,
                         color: "#FF6600"
+                    },
+                    {
+                        name: 'Bank 3000',
+                        money: 3000.0,
+                        color: "#00FFFB"
                     }
                 ],
                 transactions: [
@@ -28,7 +33,7 @@ export const store = new Vuex.Store({
                         name: 'Robux',
                         description: 'Meine Nichte ist süchtig...',
                         moneyAccount: 'Sparkasse',
-                        money: 10,
+                        money: 10.0,
                         date: '2021-11-05'
                     }
                 ],
@@ -38,7 +43,7 @@ export const store = new Vuex.Store({
                         name: 'Schweigegeld',
                         description: '...',
                         moneyAccount: 'Sparkasse',
-                        money: 50,
+                        money: 50.0,
                         startingDate: '2021-11-20',
                         endingDate: '2021-12-20',
                         rhythmNumber: 1,
@@ -55,7 +60,7 @@ export const store = new Vuex.Store({
                         description: 'Test',
                         from: 'ING DiBa',
                         to: 'Sparkasse',
-                        money: 10,
+                        money: 10.0,
                         date: '2021-11-05'
                     }
                 ]
@@ -104,6 +109,11 @@ export const store = new Vuex.Store({
         getMoneyAccounts(state) {
             return state.localStorage.moneyAccounts;
         },
+        getMoney(state) {
+            const unformattedMoney = state.localStorage.moneyAccounts[this.$route.params.item].money;
+            const formattedMoney = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(unformattedMoney).replace('€');
+            return formattedMoney;
+        },
         getTotalMoney(state) {
             return state.localStorage.totalMoney;
         },
@@ -148,7 +158,7 @@ export const store = new Vuex.Store({
             let totalMoney = 0;
             const moneyAccounts = context.state.localStorage.moneyAccounts;
             moneyAccounts.forEach(account => totalMoney += account.money);
-            context.commit('updateTotalMoney', totalMoney);
+            context.commit('updateTotalMoney', parseFloat( totalMoney.toFixed(2) ));
         },
 
         saveMoneyAccount(context, data) {
@@ -211,46 +221,110 @@ export const store = new Vuex.Store({
         },
 
         saveTransfer(context, data) {
-            //Das ist der Account von der neuen Transaktion!!!
-            data.fromIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === data.from);
-            data.toIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === data.to);
+            const fromIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === data.from);
+            const toIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === data.to);
+
+            data.fromAccount = context.state.localStorage.moneyAccounts[fromIndex];
+            data.toAccount = context.state.localStorage.moneyAccounts[toIndex];
 
             //Neue Umbuchung
             if(data.item === 'new') {
+                const newFromBalance = parseFloat( (data.fromAccount.money - data.money).toFixed(2) );
+                if(newFromBalance < 0) {
+                    return "Würden Sie diese Umbuchung durchführen, würde der Kontostand des Kontos, von dem Sie umbuchen wollen, negativ werden. Bitte geben Sie einen anderen Geldbetrag an.";
+                }
                 context.commit('saveNewTransfer', data);
             }
             //Umbuchung bearbeiten
             else {
+                //Save old transfer in data
                 data.oldTransfer = context.state.localStorage.transfers[data.item];
+
+                const oldTransfer = data.oldTransfer.money;
+                const newTransfer = data.money;
+
                 //Umbuchung bearbeiten - ohne Kontoänderung
                 if(data.oldTransfer.from === data.from  &&  data.oldTransfer.to === data.to) {
+                    //if newBalance would be negative, return dialog text
+                    const newFromBalance = parseFloat( ( data.fromAccount.money - (newTransfer - oldTransfer) ).toFixed(2) );
+                    if(newFromBalance < 0) {
+                        return "Würden Sie diese Umbuchung durchführen, würde der Kontostand des Kontos, von dem Sie umbuchen wollen, negativ werden. Bitte geben Sie einen anderen Geldbetrag an."
+                    }
+                    //else saveEditedTransfer
                     context.commit('saveEditedTransfer', data);
                 }
                 //Umbuchung bearbeiten - mit Kontoänderung
                 else {
+                    //save indexes of the from and to accounts of the oldTransfer
                     data.oldTransfer.fromIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === data.oldTransfer.from);
                     data.oldTransfer.toIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === data.oldTransfer.to);
 
+                    //save the from and to account of the oldTransaction
+                    data.oldFromAccount = context.state.localStorage.moneyAccounts[data.oldTransfer.fromIndex];
+                    data.oldToAccount = context.state.localStorage.moneyAccounts[data.oldTransfer.toIndex];
+
                     //from und to haben sich geändert
                     if(data.oldTransfer.from !== data.from  &&  data.oldTransfer.to !== data.to) {
+
+                        //if newFromBalance negative, return dialog text
+                        const newFromBalance = parseFloat( (data.fromAccount.money - data.money).toFixed(2) );
+                        if(newFromBalance < 0) {
+                            return "Würden Sie diese Umbuchung durchführen, würde der Kontostand des neuen Kontos, von dem Sie umbuchen wollen, negativ werden. Bitte geben Sie einen anderen Geldbetrag oder ein anderes Konto an."
+                        }
+
+                        //if balance of the old to account would be negative, return dialog text
+                        const toBalance = parseFloat( ( data.oldToAccount.money - oldTransfer ).toFixed(2) );
+                        if(toBalance < 0) {
+                            return "Würden Sie diese Umbuchung durchführen, würde der Kontostand des alten Kontos, auf das Sie umgebucht haben, negativ werden. Bitte geben Sie einen anderen Geldbetrag oder ein anderes Konto an."
+                        }
+
+                        //if both isn't the case, saveEditedTransferWithNewFromTo
                         context.commit('saveEditedTransferWithNewFromTo', data);
                     }
                     //from hat sich geändert
                     else if(data.oldTransfer.from !== data.from) {
+                        //if newFromBalance negative, return dialog text
+                        const newFromBalance = parseFloat( (data.fromAccount.money - data.money).toFixed(2) );
+                        if(newFromBalance < 0) {
+                            return "Würden Sie diese Umbuchung durchführen, würde der Kontostand des neuen Kontos, von dem Sie umbuchen wollen, negativ werden. Bitte geben Sie einen anderen Geldbetrag oder ein anderes Konto an."
+                        }
+                        //else saveEditedTransferWithNewFrom
                         context.commit('saveEditedTransferWithNewFrom', data);
                     }
                     //to hat sich geändert
                     else {
+
+                        //if balance of the old to account would be negative, return dialog text
+                        const toBalance = parseFloat( ( data.oldToAccount.money - oldTransfer ).toFixed(2) );
+                        if(toBalance < 0) {
+                            return "Würden Sie diese Umbuchung durchführen, würde der Kontostand des alten Kontos, auf das Sie umgebucht haben, negativ werden. Bitte geben Sie einen anderen Geldbetrag oder ein anderes Konto an."
+                        }
+                        //else saveEditedTransferWithNewTo
                         context.commit('saveEditedTransferWithNewTo', data);
                     }
                 }
             }
         },
         deleteTransfer(context, data) {
-            data.fromIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === data.from);
-            data.toIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === data.to);
+            const fromIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === data.from);
+            const toIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === data.to);
 
+            data.fromAccount = context.state.localStorage.moneyAccounts[fromIndex];
+            data.toAccount = context.state.localStorage.moneyAccounts[toIndex];
+            data.oldTransfer = context.state.localStorage.transfers[data.item];
+
+            //if balance of the to account would get negative, return dialog text
+            const toBalance = parseFloat( ( data.toAccount.money - data.oldTransfer.money ).toFixed(2) );
+            if(toBalance < 0) {
+                return "Würden Sie diese Umbuchung löschen, würde der Kontostand des Kontos, auf das Sie umgebucht haben, negativ werden."
+            }
+            //else deleteTransfer
             context.commit('deleteTransfer', data);
+        },
+
+        // eslint-disable-next-line no-unused-vars
+        test(context, data) {
+            return "Hello World";
         }
     },
     mutations: {
@@ -272,139 +346,206 @@ export const store = new Vuex.Store({
           state.localStorage.toolbarTitle = title;
         },
         updateTotalMoney(state, updatedTotalMoney) {
+            //update totalMoney entry in state
             state.localStorage.totalMoney = updatedTotalMoney;
+
+            //update localStorage
             localStorage.setItem('state', JSON.stringify(state.localStorage));
         },
 
-        saveEditedMoneyAccount(state, data) {
-            state.localStorage.moneyAccounts[data.item] = { name: data.name, money: data.money, color: data.color };
+        saveNewMoneyAccount(state, data) {
+            //save moneyAccount in state
+            state.localStorage.moneyAccounts.push({ name: data.name, money: data.money, color: data.color });
+
+            //update localStorage
             localStorage.setItem('state', JSON.stringify(state.localStorage));
         },
-        saveNewMoneyAccount(state, data) {
-            state.localStorage.moneyAccounts.push({ name: data.name, money: data.money, color: data.color });
+        saveEditedMoneyAccount(state, data) {
+            //update moneyAccount entry in state
+            state.localStorage.moneyAccounts[data.item] = { name: data.name, money: data.money, color: data.color };
+
+            //update localStorage
             localStorage.setItem('state', JSON.stringify(state.localStorage));
         },
         deleteMoneyAccount(state, data) {
+            //delete moneyAccount in state
             state.localStorage.moneyAccounts.splice(data.item, 1);
+
+            //update localStorage
             localStorage.setItem('state', JSON.stringify(state.localStorage));
         },
 
         saveNewTransaction(state, data) {
+            //state.localStorage.moneyAccounts[data.accountIndex].money += data.money;
+            //const floatFormat = new Intl.NumberFormat('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2,});
+            //const oldBalance = state.localStorage.moneyAccounts[data.accountIndex].money;
+            //const newBalance = parseFloat(floatFormat.format(oldBalance + data.money));
+            //state.localStorage.moneyAccounts[data.accountIndex].money = newBalance;
+
+            //save transaction entry in state
             state.localStorage.transactions.push({ color: data.color, name: data.name, description: data.description, money: data.money, moneyAccount: data.moneyAccount, date: data.date });
-            state.localStorage.moneyAccounts[data.accountIndex].money += data.money;
+
+            //save moneyAccount as variable
+            const account = state.localStorage.moneyAccounts[data.accountIndex];
+
+            //update account balance
+            account.money = parseFloat((account.money + data.money).toFixed(2));
             localStorage.setItem('state', JSON.stringify(state.localStorage));
         },
         saveEditedTransaction(state, data) {
             const newTransaction = data.money;
-            //accountIndex wird noch nicht übergeben
-            state.localStorage.moneyAccounts[data.accountIndex].money += (newTransaction - data.oldTransaction.money);
+            const oldTransaction = data.oldTransaction.money;
+            const account = state.localStorage.moneyAccounts[data.accountIndex];
 
+            //update account balance
+            account.money = parseFloat( (account.money + (newTransaction - oldTransaction) ).toFixed(2) );
+
+            //update transaction entry in state
             state.localStorage.transactions[data.item] = { color: data.color, name: data.name, description: data.description, money: data.money, moneyAccount: data.moneyAccount, date: data.date };
+
+            //update localStorage
             localStorage.setItem('state', JSON.stringify(state.localStorage));
         },
         saveEditedTransactionWithNewMoneyAccount(state, data) {
             const newTransaction = data.money;
+            const oldTransaction = data.oldTransaction.money;
 
             //Alten Betrag der vorherigen Transaktion von deren Konto abziehen / wieder drauf rechnen.
-            state.localStorage.moneyAccounts[data.oldAccountIndex].money -= data.oldTransaction.money;
+            const oldAccount = state.localStorage.moneyAccounts[data.oldAccountIndex];
+            oldAccount.money = parseFloat( ( oldAccount.money - oldTransaction ).toFixed(2) );
 
             //Neuen Betrag auf neues Konto anrechnen
-            state.localStorage.moneyAccounts[data.accountIndex].money += newTransaction;
+            const newAccount = state.localStorage.moneyAccounts[data.accountIndex]
+            newAccount.money =  parseFloat( ( newAccount.money + newTransaction ).toFixed(2) );
 
+            //update transaction entry in state
             state.localStorage.transactions[data.item] = { color: data.color, name: data.name, description: data.description, money: data.money, moneyAccount: data.moneyAccount, date: data.date };
+
+            //update localStorage
             localStorage.setItem('state', JSON.stringify(state.localStorage));
         },
         deleteTransaction(state, data) {
-            state.localStorage.moneyAccounts[data.accountIndex].money -= data.money;
+            const account = state.localStorage.moneyAccounts[data.accountIndex];
+            //undo transaction
+            account.money =  parseFloat( ( account.money - data.money ).toFixed(2) );
+
+            //delete transaction entry in state
             state.localStorage.transactions.splice(data.item, 1);
+
+            //update localStorage
             localStorage.setItem('state', JSON.stringify(state.localStorage));
         },
 
         saveNewRepeatingTransaction(state, data) {
+            //save repeatingTransaction entry
             state.localStorage.repeatingTransactions.push({ color: data.color, name: data.name, description: data.description, money: data.money, moneyAccount: data.moneyAccount, startingDate: data.startingDate, endingDate: data.endingDate, rhythmNumber: data.rhythmNumber, rhythmType: data.rhythmType, weekdays: data.weekdays, rhythmText: data.rhythmText });
             //state.localStorage.moneyAccounts[data.accountIndex].money += data.money;
+
+            //update localStorage
             localStorage.setItem('state', JSON.stringify(state.localStorage));
             //console.log(state.localStorage.repeatingTransactions);
         },
         saveEditedRepeatingTransaction(state, data) {
+            console.log('Hi');
+
+            //update repTransaction entry
             state.localStorage.repeatingTransactions[data.item] = { color: data.color, name: data.name, description: data.description, money: data.money, moneyAccount: data.moneyAccount, startingDate: data.startingDate, endingDate: data.endingDate, rhythmNumber: data.rhythmNumber, rhythmType: data.rhythmType, weekdays: data.weekdays, rhythmText: data.rhythmText };
+
+            //update localStorage
             localStorage.setItem('state', JSON.stringify(state.localStorage));
         },
         deleteRepeatingTransaction(state, data) {
+            //delete repTransaction entry
             state.localStorage.repeatingTransactions.splice(data.item, 1);
+
+            //update localStorage
             localStorage.setItem('state', JSON.stringify(state.localStorage));
         },
 
         saveNewTransfer(state, data) {
+            //save transfer entry
             state.localStorage.transfers.push({ colorFrom: data.colorFrom, colorTo: data.colorTo, name: data.name, description: data.description, money: data.money, from: data.from, to: data.to, date: data.date });
 
-            state.localStorage.moneyAccounts[data.fromIndex].money -= data.money;
-            state.localStorage.moneyAccounts[data.toIndex].money += data.money;
+            //update balances of from and to
+            data.fromAccount.money = parseFloat( ( data.fromAccount.money - data.money ).toFixed(2) );
+            data.toAccount.money = parseFloat( ( data.toAccount.money + data.money ).toFixed(2) );
 
+            //update localStorage
             localStorage.setItem('state', JSON.stringify(state.localStorage));
         },
         saveEditedTransfer(state, data) {
+            const oldTransfer = data.oldTransfer.money;
             const newTransfer = data.money;
-            state.localStorage.moneyAccounts[data.fromIndex].money -= (newTransfer - data.oldTransfer.money);
-            state.localStorage.moneyAccounts[data.toIndex].money += (newTransfer - data.oldTransfer.money);
 
-            //State und localStorage updaten
+            //update balances of from and to
+            data.fromAccount.money = parseFloat( ( data.fromAccount.money - (newTransfer - oldTransfer) ).toFixed(2) );
+            data.toAccount.money = parseFloat( ( data.toAccount.money + (newTransfer - oldTransfer) ).toFixed(2) ) ;
+
+            //update transfer entry and localStorage
             state.localStorage.transfers[data.item] = { colorFrom: data.colorFrom, colorTo: data.colorTo, name: data.name, description: data.description, money: data.money, from: data.from, to: data.to, date: data.date };
             localStorage.setItem('state', JSON.stringify(state.localStorage));
         },
         saveEditedTransferWithNewFromTo(state, data) {
+            const oldTransfer = data.oldTransfer.money;
+            const newTransfer = data.money;
             //Geld beim alten from wiederherstellen
-            state.localStorage.moneyAccounts[data.oldTransfer.fromIndex].money += data.oldTransfer.money;
+            data.oldFromAccount.money = parseFloat( ( data.oldFromAccount.money + oldTransfer ).toFixed(2) );
             //Umbuchung vom neuen from abrechnen
-            state.localStorage.moneyAccounts[data.fromIndex].money -= data.money;
+            data.fromAccount.money = parseFloat( ( data.fromAccount.money - newTransfer ).toFixed(2) );
             //Geld vom alten to wieder abziehen
-            state.localStorage.moneyAccounts[data.oldTransfer.toIndex].money -= data.oldTransfer.money;
+            data.oldToAccount.money = parseFloat( ( data.oldToAccount.money - oldTransfer ).toFixed(2) );
             //Umbuchung auf das neue to rechnen
-            state.localStorage.moneyAccounts[data.toIndex].money += data.money;
+            data.toAccount.money = parseFloat( ( data.toAccount.money + newTransfer ).toFixed(2) );
 
-            //State und localStorage updaten
+            //update transfer entry and localStorage
             state.localStorage.transfers[data.item] = { colorFrom: data.colorFrom, colorTo: data.colorTo, name: data.name, description: data.description, money: data.money, from: data.from, to: data.to, date: data.date };
             localStorage.setItem('state', JSON.stringify(state.localStorage));
         },
         saveEditedTransferWithNewFrom(state, data) {
-            const newTransferMoney = data.money;
+            const oldTransfer = data.oldTransfer.money;
+            const newTransfer = data.money;
 
             //Geld beim alten from wiederherstellen
-            state.localStorage.moneyAccounts[data.oldTransfer.fromIndex].money += data.oldTransfer.money;
+            data.oldFromAccount.money = parseFloat( ( data.oldFromAccount.money + oldTransfer ).toFixed(2) );
             //Umbuchung vom neuen from abrechnen
-            state.localStorage.moneyAccounts[data.fromIndex].money -= data.money;
+            data.fromAccount.money = parseFloat( ( data.fromAccount.money - newTransfer ).toFixed(2) );
             //to updaten
-            state.localStorage.moneyAccounts[data.toIndex].money += (newTransferMoney - data.oldTransfer.money);
+            data.toAccount.money = parseFloat( ( data.toAccount.money + (newTransfer - oldTransfer) ).toFixed(2) );
 
-            //State und localStorage updaten
+            //update transfer entry and localStorage
             state.localStorage.transfers[data.item] = { colorFrom: data.colorFrom, colorTo: data.colorTo, name: data.name, description: data.description, money: data.money, from: data.from, to: data.to, date: data.date };
             localStorage.setItem('state', JSON.stringify(state.localStorage));
 
 
         },
         saveEditedTransferWithNewTo(state, data) {
-            const newTransferMoney = data.money;
+            const oldTransfer = data.oldTransfer.money;
+            const newTransfer = data.money;
 
             //Geld vom alten to wieder abziehen
-            state.localStorage.moneyAccounts[data.oldTransfer.toIndex].money -= data.oldTransfer.money;
+            data.oldToAccount.money = parseFloat( ( data.oldToAccount.money - oldTransfer ).toFixed(2) );
             //Umbuchung auf das neue to rechnen
-            state.localStorage.moneyAccounts[data.toIndex].money += data.money;
+            data.toAccount.money = parseFloat( ( data.toAccount.money + newTransfer ).toFixed(2) );
             //from updaten
-            state.localStorage.moneyAccounts[data.fromIndex].money -= (newTransferMoney - data.oldTransfer.money);
+            data.fromAccount.money = parseFloat( ( data.fromAccount.money - (newTransfer - oldTransfer) ).toFixed(2) );
 
-            //State und localStorage updaten
+            //update transfer entry and localStorage
             state.localStorage.transfers[data.item] = { colorFrom: data.colorFrom, colorTo: data.colorTo, name: data.name, description: data.description, money: data.money, from: data.from, to: data.to, date: data.date };
             localStorage.setItem('state', JSON.stringify(state.localStorage));
 
         },
         deleteTransfer(state, data) {
-            state.localStorage.moneyAccounts[data.fromIndex].money += data.money;
-            state.localStorage.moneyAccounts[data.toIndex].money -= data.money;
+            //Undo transfer in from and to
+            data.fromAccount.money += data.money;
+            data.toAccount.money -= data.money;
 
+            //delete transfer entry
             state.localStorage.transfers.splice(data.item, 1);
 
+            //update localStorage
             localStorage.setItem('state', JSON.stringify(state.localStorage));
         }
     }
 });
 
+//parseFloat( (  ).toFixed(2) )

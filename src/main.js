@@ -40,8 +40,6 @@ import {router} from "./router";
 //Vuetify
 import vuetify from './plugins/vuetify'
 
-
-
 //Keine Ahnung
 Vue.config.productionTip = false
 
