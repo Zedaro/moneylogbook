@@ -209,10 +209,9 @@ export default {
         color: this.$store.getters.getMoneyAccounts.find(account => account.name === this.moneyAccount).color,
         name: this.name,
         description: this.description,
-        moneyAccount: this.moneyAccount,
+        moneyAccount: this.$store.getters.getMoneyAccount(this.moneyAccount),
         money: parseFloat(this.money.toFixed(2)),   //.replace(/\./g, ','),
-        date: this.date,
-        //color: this.color
+        date: this.date
       };
       this.$store.dispatch('saveTransaction', data)
           .then( (dialogText) => {
@@ -230,12 +229,7 @@ export default {
     },
     deleteData() {
       const data = {
-        item: this.$route.params.item,
-        name: this.name,
-        description: this.description,
-        moneyAccount: this.moneyAccount,
-        money: parseFloat(this.money.toFixed(2)),   //.replace(/\./g, ','),
-        date: this.date
+        item: this.$route.params.item
       };
 
       this.$store.dispatch('deleteTransaction', data)

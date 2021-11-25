@@ -91,6 +91,22 @@ export const store = new Vuex.Store({
         },
     */
     getters: {
+
+        getMoneyAccount(state) {
+            return (accountName) => state.localStorage.moneyAccounts.find(account => account.name === accountName);
+        },
+        getTransaction(state) {
+            return (index) => state.localStorage.transactions[index];
+        },
+        getRepeatingTransaction(state) {
+            return (index) => state.localStorage.repeatingTransactions[index];
+        },
+        getTransfer(state) {
+            return (index) => state.localStorage.transfers[index];
+        },
+
+
+
         getLocalStorage() {
             return JSON.parse(localStorage.getItem('state'));
         },
@@ -187,51 +203,50 @@ export const store = new Vuex.Store({
         },
 
         saveTransaction(context, data) {
-            //Das ist der Account von der neuen Transaktion!!!
-            data.accountIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === data.moneyAccount);
-
+            //New Transaction
             if(data.item === 'new') {
-
-                const balance = context.state.localStorage.moneyAccounts.find(account => account.name === data.moneyAccount).money;
-                //const oldTransaction = this.$store.getters.getTransactions[this.$route.params.item].money;
+                const balance = data.moneyAccount.money;
                 const newBalance = parseFloat( ( balance + data.money ).toFixed(2) )
 
                 if(newBalance < 0) {
                     return "Wenn Sie diese Transaktion durchführen würden, würde der Kontostand negativ werden. Bitte geben Sie einen anderen Geldbetrag an.";
                 }
                 else {
+                    data.newBalance = newBalance;
                     context.commit('saveNewTransaction', data);
                 }
-            } else {
+            }
+            //Edit Transaction
+            else {
                 //hol dir alte und neue Transaktion. Vergleiche die moneyAccount Einträge
-                const oldTransaction = context.state.localStorage.transactions[data.item];
-                data.oldTransaction = oldTransaction;
+                data.oldTransaction = context.getters.getTransaction(data.item);
 
-                if(oldTransaction.moneyAccount === data.moneyAccount) {
+                //Edit Transaction without new moneyAccount
+                if(data.oldTransaction.moneyAccount === data.moneyAccount.name) {
 
-                    const balance = context.state.localStorage.moneyAccounts.find(account => account.name === data.moneyAccount).money;
-                    //const oldTransaction = this.$store.getters.getTransactions[this.$route.params.item].money;
-                    const newBalance = parseFloat( ( balance + (data.money - oldTransaction.money) ).toFixed(2) )
+                    const balance = data.moneyAccount.money;
+                    const newBalance = parseFloat( ( balance + (data.money - data.oldTransaction.money) ).toFixed(2) )
 
                     if(newBalance < 0) {
                         return "Wenn Sie diese Transaktion durchführen würden, würde der Kontostand negativ werden. Bitte geben Sie einen anderen Geldbetrag an.";
                     }
                     else {
+                        data.newBalance = newBalance;
                         context.commit('saveEditedTransaction', data);
                     }
-                } else {
+                }
+                //Edit transaction with new moneyAccount
+                else {
 
-                    data.oldAccountIndex = context.state.localStorage.moneyAccounts.findIndex(account => account.name === oldTransaction.moneyAccount);
-
-
+                    data.oldAccount = context.getters.getMoneyAccount(data.oldTransaction.moneyAccount); //context.state.localStorage.moneyAccounts.find(account => account.name === data.oldTransaction.moneyAccount);
                     const newTransaction = data.money;
 
+
                     //Alten Betrag der vorherigen Transaktion von deren Konto abziehen / wieder drauf rechnen.
-                    const oldAccount = context.state.localStorage.moneyAccounts[data.oldAccountIndex];
-                    const oldAccount_newBalance = parseFloat( ( oldAccount.money - data.oldTransaction.money ).toFixed(2) );
+                    const oldAccount_newBalance = parseFloat( ( data.oldAccount.money - data.oldTransaction.money ).toFixed(2) );
 
                     //Neuen Betrag auf neues Konto anrechnen
-                    const newAccount = context.state.localStorage.moneyAccounts[data.accountIndex]
+                    const newAccount = data.moneyAccount //context.state.localStorage.moneyAccounts[data.moneyAccount];
                     const newAccount_newBalance =  parseFloat( ( newAccount.money + newTransaction ).toFixed(2) );
 
                     if(oldAccount_newBalance < 0) {
@@ -239,6 +254,8 @@ export const store = new Vuex.Store({
                     } else if(newAccount_newBalance < 0) {
                         return "Wenn Sie diese Transaktion durchführen würden, würde der neue Kontostand negativ werden. Bitte geben Sie einen anderen Geldbetrag oder ein anderes Konto an.";
                     } else {
+                        data.oldAccount_newBalance = oldAccount_newBalance;
+                        data.newAccount_newBalance = newAccount_newBalance;
                         context.commit('saveEditedTransactionWithNewMoneyAccount', data);
                     }
                 }
@@ -248,10 +265,8 @@ export const store = new Vuex.Store({
             context.dispatch('updateLocalStorage');
         },
         deleteTransaction(context, data) {
-            data.transactionToDelete = context.state.localStorage.transactions[data.item];
-            data.account = context.state.localStorage.moneyAccounts.find(account => account.name === data.transactionToDelete.moneyAccount);
-
-            console.log(context.state.localStorage.transactions[data.item]);
+            data.transactionToDelete = context.getters.getTransaction(data.item); //context.state.localStorage.transactions[data.item];
+            data.account = context.getters.getMoneyAccount(data.transactionToDelete.moneyAccount); //context.state.localStorage.moneyAccounts.find(account => account.name === data.transactionToDelete.moneyAccount);
 
             const balance = data.account.money;
             const newBalance = parseFloat( ( balance - data.transactionToDelete.money ).toFixed(2) )
@@ -259,6 +274,7 @@ export const store = new Vuex.Store({
             if(newBalance < 0) {
                 return "Wenn Sie diese Transaktion löschen würden, würde der Kontostand negativ werden.";
             } else {
+                data.newBalance = newBalance;
                 context.commit('deleteTransaction', data);
             }
 
@@ -464,51 +480,50 @@ export const store = new Vuex.Store({
             //state.localStorage.moneyAccounts[data.accountIndex].money = newBalance;
 
             //save transaction entry in state
-            state.localStorage.transactions.push({ color: data.color, name: data.name, description: data.description, money: data.money, moneyAccount: data.moneyAccount, date: data.date });
+            state.localStorage.transactions.push({ color: data.color, name: data.name, description: data.description, money: data.money, moneyAccount: data.moneyAccount.name, date: data.date });
+            //update account balance
+            data.moneyAccount.money = data.newBalance;
 
             //save moneyAccount as variable
-            const account = state.localStorage.moneyAccounts[data.accountIndex];
+            //const account = state.localStorage.moneyAccounts[data.accountIndex];
 
-            //update account balance
-            account.money = parseFloat((account.money + data.money).toFixed(2));
+
             //localStorage.setItem('state', JSON.stringify(state.localStorage));
         },
         saveEditedTransaction(state, data) {
-            const newTransaction = data.money;
-            const oldTransaction = data.oldTransaction.money;
-            const account = state.localStorage.moneyAccounts[data.accountIndex];
+            //const newTransaction = data.money;
+            //const oldTransaction = data.oldTransaction.money;
+            //const account = state.localStorage.moneyAccounts[data.accountIndex];
 
             //update account balance
-            account.money = parseFloat( (account.money + (newTransaction - oldTransaction) ).toFixed(2) );
-
+            data.moneyAccount.money = data.newBalance;
             //update transaction entry in state
-            state.localStorage.transactions[data.item] = { color: data.color, name: data.name, description: data.description, money: data.money, moneyAccount: data.moneyAccount, date: data.date };
+            state.localStorage.transactions[data.item] = { color: data.color, name: data.name, description: data.description, money: data.money, moneyAccount: data.moneyAccount.name, date: data.date };
 
             //update localStorage
             //localStorage.setItem('state', JSON.stringify(state.localStorage));
         },
         saveEditedTransactionWithNewMoneyAccount(state, data) {
-            const newTransaction = data.money;
-            const oldTransaction = data.oldTransaction.money;
+            //const newTransaction = data.money;
+            //const oldTransaction = data.oldTransaction.money;
 
             //Alten Betrag der vorherigen Transaktion von deren Konto abziehen / wieder drauf rechnen.
-            const oldAccount = state.localStorage.moneyAccounts[data.oldAccountIndex];
-            oldAccount.money = parseFloat( ( oldAccount.money - oldTransaction ).toFixed(2) );
+            //const oldAccount = state.localStorage.moneyAccounts[data.oldAccountIndex];
+            data.oldAccount.money = data.oldAccount_newBalance;
 
             //Neuen Betrag auf neues Konto anrechnen
-            const newAccount = state.localStorage.moneyAccounts[data.accountIndex]
-            newAccount.money =  parseFloat( ( newAccount.money + newTransaction ).toFixed(2) );
+            //const newAccount = state.localStorage.moneyAccounts[data.accountIndex]
+            data.moneyAccount.money =  data.newAccount_newBalance;
 
             //update transaction entry in state
-            state.localStorage.transactions[data.item] = { color: data.color, name: data.name, description: data.description, money: data.money, moneyAccount: data.moneyAccount, date: data.date };
+            state.localStorage.transactions[data.item] = { color: data.color, name: data.name, description: data.description, money: data.money, moneyAccount: data.moneyAccount.name, date: data.date };
 
             //update localStorage
             //localStorage.setItem('state', JSON.stringify(state.localStorage));
         },
         deleteTransaction(state, data) {
             //undo transaction
-            data.account.money =  parseFloat( ( data.account.money - data.transactionToDelete.money ).toFixed(2) );
-
+            data.account.money =  data.newBalance;
             //delete transaction entry in state
             state.localStorage.transactions.splice(data.item, 1);
 
