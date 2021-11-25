@@ -204,70 +204,53 @@ export default {
       }
       */
 
-      const balance = this.$store.getters.getMoneyAccounts.find(account => account.name === this.moneyAccount).money;
-      //const oldTransaction = this.$store.getters.getTransactions[this.$route.params.item].money;
-      const newBalance = parseFloat( ( balance + this.money ).toFixed(2) )
-
-      //If the new balance would be negative, open the warning dialog
-      if( newBalance < 0) {
-        this.dialogText = "Wenn Sie diese Transaktion durchführen würden, würde der Kontostand negativ werden. Bitte geben Sie einen anderen Geldbetrag an.";
-        this.dialog = true;
-      }
-      //else save the transaction
-      else {
-        const data = {
-          item: this.$route.params.item,
-          color: this.$store.getters.getMoneyAccounts.find(account => account.name === this.moneyAccount).color,
-          name: this.name,
-          description: this.description,
-          moneyAccount: this.moneyAccount,
-          money: parseFloat(this.money.toFixed(2)),   //.replace(/\./g, ','),
-          date: this.date,
-          //color: this.color
-        };
-        this.$store.dispatch('saveTransaction', data)
-            .then( () => {
-              this.$store.dispatch('updateTotalMoney');
-            })
-            /*.then( () => {
-              console.log(this.$store.getters.getLocalStorage);
-            })
-            */
-            .then(() => {
-              this.$router.push({name: 'transactions'});
-            });
-      }
+      const data = {
+        item: this.$route.params.item,
+        color: this.$store.getters.getMoneyAccounts.find(account => account.name === this.moneyAccount).color,
+        name: this.name,
+        description: this.description,
+        moneyAccount: this.moneyAccount,
+        money: parseFloat(this.money.toFixed(2)),   //.replace(/\./g, ','),
+        date: this.date,
+        //color: this.color
+      };
+      this.$store.dispatch('saveTransaction', data)
+          .then( (dialogText) => {
+            if(dialogText !== undefined) {
+              this.dialogText = dialogText; //"Wenn Sie diese Transaktion durchführen würden, würde der Kontostand negativ werden. Bitte geben Sie einen anderen Geldbetrag an.";
+              this.dialog = true;
+            }
+            else {
+              this.$store.dispatch('updateTotalMoney')
+                  .then(() => {
+                    this.$router.push({name: 'transactions'});
+                  });
+            }
+          })
     },
     deleteData() {
+      const data = {
+        item: this.$route.params.item,
+        name: this.name,
+        description: this.description,
+        moneyAccount: this.moneyAccount,
+        money: parseFloat(this.money.toFixed(2)),   //.replace(/\./g, ','),
+        date: this.date
+      };
 
-      const balance = this.$store.getters.getMoneyAccounts.find(account => account.name === this.moneyAccount).money;
-      const newBalance = parseFloat( ( balance - this.money ).toFixed(2) )
-
-      //If the new balance would be negative, open the warning dialog
-      if( newBalance < 0) {
-        this.dialogText = "Wenn Sie diese Transaktion löschen würden, würde der Kontostand negativ werden.";
-        this.dialog = true;
-      }
-      //else delete the transaction
-      else {
-        const data = {
-          item: this.$route.params.item,
-          name: this.name,
-          description: this.description,
-          moneyAccount: this.moneyAccount,
-          money: parseFloat(this.money.toFixed(2)),   //.replace(/\./g, ','),
-          date: this.date,
-          //color: this.color
-        };
-
-        this.$store.dispatch('deleteTransaction', data)
-            .then( () => {
-              this.$store.dispatch('updateTotalMoney');
-            })
-            .then(() => {
-              this.$router.push({name: 'transactions'});
-            });
-      }
+      this.$store.dispatch('deleteTransaction', data)
+          .then( (dialogText) =>{
+            if(dialogText !== undefined) {
+              this.dialogText = dialogText;
+              this.dialog = true;
+            }
+            else {
+              this.$store.dispatch('updateTotalMoney')
+                  .then(() => {
+                    this.$router.push({name: 'transactions'});
+                  });
+            }
+          })
     }
   },
   /*
