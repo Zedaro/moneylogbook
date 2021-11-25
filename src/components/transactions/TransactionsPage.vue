@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="page-div">
     <transactions-list></transactions-list>
     <plus-minus></plus-minus>
   </div>

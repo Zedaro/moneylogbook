@@ -1,6 +1,6 @@
 <template>
 
-  <v-card width="50%" :to="moneyAccountsExist ? item : ''">
+  <v-card class="list-item" :to="moneyAccountsExist ? item : ''">
     <div class="color" :style="{ backgroundColor: color }"></div>
     <v-card-title class="card-title">{{ this.name }}</v-card-title>
     <v-card-text class="text-center grey--text">{{ this.description }}</v-card-text>

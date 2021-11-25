@@ -7,7 +7,6 @@ Vue.use(VueRouter)
 import OverviewPage from "@/components/OverviewPage";
 import TransactionsPage from "@/components/transactions/TransactionsPage";
 import RepeatingTransactionsPage from "@/components/repeatingTransactions/RepeatingTransactionsPage";
-import MoneyAccountsPage from "@/components/moneyAccounts/page/MoneyAccountsPage";
 import MoneyAccountForm from "@/components/moneyAccounts/form/MoneyAccountForm";
 import TransactionForm from "@/components/transactions/form/TransactionForm";
 import RepeatingTransactionForm from "@/components/repeatingTransactions/form/RepeatingTransactionForm";
@@ -61,12 +60,6 @@ const routes = [
     name: 'transferForm',
     component: TransferForm,
     meta: { formType: 'Umbuchungs-Formular' }
-  },
-  {
-    path: '/moneyAccounts',
-    name: "moneyAccounts",
-    component: MoneyAccountsPage,
-    meta: { title: 'Konten' }
   },
     /*
   {

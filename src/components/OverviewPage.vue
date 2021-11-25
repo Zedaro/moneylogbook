@@ -1,7 +1,7 @@
 <template>
   <div>
     <doughnut-chart></doughnut-chart>
-    <v-card width="50%">
+    <v-card class="list-item">
       <v-card-title id="card-title">Gesamt</v-card-title>
       <v-card-text class="text-center">{{ totalMoney }}</v-card-text>
     </v-card>
