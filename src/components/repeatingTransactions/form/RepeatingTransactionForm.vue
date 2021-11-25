@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-card>
+    <v-card class="form-card">
 
       <validation-observer v-slot="{ handleSubmit }">
         <v-form ref="transactionForm" @submit.prevent="handleSubmit(saveData)">
@@ -631,12 +631,6 @@ export default {
 
 <style scoped>
 
-.v-card {
-  width: 90%;
-  margin: 50px auto 0 auto;
-  padding: 2%;
-}
-
 .rhythm-div {
   display: flex;
   flex-wrap: wrap;
@@ -656,12 +650,6 @@ export default {
 }
 
 @media only screen and (min-width: 768px) {
-  .v-card {
-    width: 50%;
-    margin: 50px auto 0 auto;
-    padding: 2%;
-  }
-
   .rhythm-div {
     display: flex;
     flex-wrap: wrap;

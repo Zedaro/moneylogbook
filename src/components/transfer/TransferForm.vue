@@ -387,10 +387,5 @@ export default {
 
 <style scoped>
 
-.form-card {
-  width: 50%;
-  margin: 50px auto 0 auto;
-  padding: 2%;
-}
 
 </style>

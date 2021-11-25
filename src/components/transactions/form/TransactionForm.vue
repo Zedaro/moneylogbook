@@ -1,8 +1,8 @@
 <template>
   <div>
 
-    <v-dialog v-model="dialog" max-width="25%">
-      <v-card>
+    <v-dialog v-model="dialog" content-class="dialog">
+      <v-card class="dialog-card">
         <v-card-title class="text-h5">
           Fehler
         </v-card-title>
@@ -101,7 +101,9 @@
 
     </v-card>
 
+    <!--
     <button @click="test">Test</button>
+    -->
 
   </div>
 </template>
@@ -262,10 +264,41 @@ export default {
 
 <style scoped>
 
-.form-card {
-  width: 50%;
-  margin: 50px auto 0 auto;
-  padding: 2%;
+
+
+.dialog-card {
+  background-color: #ff879c;
 }
+
+</style>
+
+<style>
+  .dialog {
+    max-width: 85%;
+  }
+
+  @media only screen and (min-width: 600px) {
+    .dialog {
+      max-width: 60%;
+    }
+  }
+
+  @media only screen and (min-width: 960px) {
+    .dialog {
+      max-width: 60%;
+    }
+  }
+
+  @media only screen and (min-width: 1264px) {
+    .dialog {
+      max-width: 30%;
+    }
+  }
+
+  @media only screen and (min-width: 1904px) {
+    .dialog {
+      max-width: 30%;
+    }
+  }
 
 </style>

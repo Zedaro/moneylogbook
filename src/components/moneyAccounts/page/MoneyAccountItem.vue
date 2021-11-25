@@ -1,6 +1,6 @@
 <template>
 
-  <v-card width="50%" :to="item">
+  <v-card class="list-item" :to="item">
     <div class="color" :style="{ backgroundColor: this.color }"></div>
     <v-card-title id="card-title">{{ this.name }}</v-card-title>
     <v-card-text class="text-center subtitle-1 money">{{ new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(this.money) }}</v-card-text>
