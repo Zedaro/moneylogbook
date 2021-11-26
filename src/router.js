@@ -12,12 +12,19 @@ import TransactionForm from "@/components/transactions/form/TransactionForm";
 import RepeatingTransactionForm from "@/components/repeatingTransactions/form/RepeatingTransactionForm";
 import TransfersPage from "@/components/transfer/TransfersPage";
 import TransferForm from "@/components/transfer/TransferForm";
+import TestCSS from "@/components/TestCSS";
 
 
 const routes = [
   {
     path: '/',
     redirect: { name: 'overview' }
+  },
+  {
+    path: '/testcss',
+    name: 'testcss',
+    component: TestCSS,
+    meta: { title: 'testcss' }
   },
   {
     path: '/overview',

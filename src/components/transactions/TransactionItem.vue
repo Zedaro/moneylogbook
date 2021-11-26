@@ -1,12 +1,24 @@
 <template>
 
   <v-card class="list-item" :to="moneyAccountsExist ? item : ''">
+
     <div class="color" :style="{ backgroundColor: color }"></div>
-    <v-card-title class="card-title">{{ this.name }}</v-card-title>
-    <v-card-text class="text-center grey--text">{{ this.description }}</v-card-text>
-    <v-card-text class="text-center subtitle-1 money" :class="moneyColor">{{ new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(this.money) }}</v-card-text>
-    <v-card-text class="text-center grey--text">{{ this.moneyAccount }}</v-card-text>
-    <v-card-text class="text-center grey--text">{{ formattedDate }}</v-card-text>
+
+    <v-card-text class="text-center grey--text date">{{ formattedDate }}</v-card-text>
+    <!-- <v-card-text class="text-center grey--text description">{{ this.description }}</v-card-text> -->
+
+    <div class="money-div">
+      <v-card-text class="text-center money" :class="moneyColor">{{ new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(this.money) }}</v-card-text>
+    </div>
+
+    <div class="money-account-div">
+      <v-card-text class="text-center money-account">{{ this.moneyAccount }}</v-card-text>
+    </div>
+
+    <div class="name-div">
+      <v-card-text class="text-center grey--text name">{{ this.name }}</v-card-text>
+    </div>
+
   </v-card>
 
 </template>
@@ -45,7 +57,63 @@ export default {
 <style scoped>
 
 .v-card {
+  /*
+  display: grid;
+  grid-template-columns: 50% 50%;
+  grid-template-rows: 10% 40% 40%;
+  */
+
   margin: auto;
+}
+
+
+.name-div{
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  padding: 0 10% 5% 10%;
+}
+
+.name {
+  font-size: 20px;
+  min-width: 0;
+  word-wrap: break-word;
+  padding: 0;
+}
+
+.money-div{
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  padding: 0 10% 5% 10%;
+}
+
+.money {
+  font-size: 25px;
+  padding: 0;
+  min-width: 0;
+  word-wrap: break-word;
+}
+
+.money-account-div{
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  padding: 0 10% 5% 10%;
+}
+
+.money-account {
+  font-size: 20px;
+  padding: 0;
+  min-width: 0;
+  word-wrap: break-word;
+}
+
+.date {
+  display: flex;
+  justify-content: flex-end;
+  align-content: center;
+  padding-bottom: 2%;
 }
 
 .color {
@@ -59,8 +127,5 @@ export default {
   justify-content: center;
 }
 
-.money {
-  padding-bottom: 0;
-}
 
 </style>

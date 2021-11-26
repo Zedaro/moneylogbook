@@ -1,10 +1,11 @@
 <template>
 
-  <v-container>
-    <v-btn class="mx-2" fab dark small color="green" :to="item">
+  <!-- :class="{ 'drawer-active': drawerState, 'drawer-inactive': !drawerState }" -->
+  <div class="div" >
+    <v-btn class="plus-button" fab dark medium color="green" :to="item">
       <v-icon dark>mdi-plus</v-icon>
     </v-btn>
-  </v-container>
+  </div>
 
 </template>
 
@@ -36,6 +37,9 @@
             params: { item: 'new' }
           };
         }
+      },
+      drawerState() {
+        return (this.$store.state.drawer);
       }
     }
 }
@@ -45,17 +49,42 @@
 
 <style scoped>
 
-  .container {
+  .div {
     position: fixed;
-    left: 25%;
-    top: 80%;
-    width: 50%;
-    /* border: black solid 1px; */
+    display: flex;
+    justify-content: center;
+    /*top: 83%;*/
+    top: 87.5%;
+    left: calc(50% - 28px);
+    width: fit-content;
+    height: fit-content;
+
+    padding: 0;
+    /*height: 150px;*/
+
+
+
+    /*transition: width 0.25s;*/
   }
 
-  .v-btn {
-    position: relative;
-    left: 70%;
+  .plus-button {
+    margin: 0;
+    padding: 0;
+    align-self: center;
   }
+
+  /*
+  @media only screen and (min-width: 1264px) {
+    .drawer-active {
+      width: calc(100% - 256px);
+    }
+
+    .drawer-inactive {
+      width: 100%;
+    }
+  }
+  */
+
+
 
 </style>

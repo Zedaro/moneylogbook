@@ -1,13 +1,13 @@
 <template>
 
-  <v-container>
-    <v-btn v-if="this.$route.params.item !== 'new'" class="delete mx-2" fab dark medium color="red" @click="deleteData">
+  <div>
+    <v-btn v-if="this.$route.params.item !== 'new'" class="delete-button mx-2" fab dark medium color="red" @click="deleteData">
       <v-icon dark>mdi-delete</v-icon>
     </v-btn>
-    <v-btn type="submit" class="save mx-2" fab dark medium color="green">
+    <v-btn type="submit" class="save-button mx-2" fab dark medium color="green">
       <v-icon dark>mdi-check</v-icon>
     </v-btn>
-  </v-container>
+  </div>
 
 </template>
 
@@ -73,14 +73,16 @@ export default {
     /* border: black solid 1px; */
   }
 
-  .delete {
-    position: relative;
-    left: 15%;
+  .delete-button {
+    position: fixed;
+    top: 90%;
+    left: calc(25% - 28px);
   }
 
-  .save {
-    position: relative;
-    left: 70%;
+  .save-button {
+    position: fixed;
+    top: 90%;
+    left: calc(75% - 28px);
   }
 
 </style>

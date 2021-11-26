@@ -4,6 +4,7 @@
     <the-header></the-header>
     <v-main>
       <router-view/>
+      <plus-minus v-if="noForm"></plus-minus>
     </v-main>
   </v-app>
 </template>
@@ -11,18 +12,28 @@
 <script>
 import NavigationDrawer from "@/components/NavigationDrawer";
 import TheHeader from "@/components/TheHeader";
-
+import PlusMinus from "@/components/buttons/PlusMinus";
 
 export default {
   name: 'App',
   components: {
     NavigationDrawer,
-    TheHeader
+    TheHeader,
+    PlusMinus
+  },
+  computed: {
+    noForm() {
+      return (this.$route.meta.formType) ? false : true;
+    }
   }
 }
 </script>
 
 <style>
+
+body {
+  padding-bottom: 200px;
+}
 
 .form-card {
   width: 90%;

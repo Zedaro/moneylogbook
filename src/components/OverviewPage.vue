@@ -6,7 +6,6 @@
       <v-card-text class="text-center">{{ totalMoney }}</v-card-text>
     </v-card>
     <money-accounts-list></money-accounts-list>
-    <plus-minus></plus-minus>
     <!-- <button @click="test">Test</button> -->
     <!-- <button id="newLocalStorageButton" @click="newLocalStorage">New localStorage</button> -->
   </div>
@@ -16,10 +15,9 @@
 <script>
 import DoughnutChart from "@/components/chart/DoughnutChart";
 import MoneyAccountsList from "@/components/moneyAccounts/page/MoneyAccountsList";
-import PlusMinus from "@/components/buttons/PlusMinus";
 export default {
   name: "OverviewPage",
-  components: { DoughnutChart, MoneyAccountsList, PlusMinus },
+  components: { DoughnutChart, MoneyAccountsList },
   computed: {
     totalMoney() {
         return this.$store.getters.getFormattedTotalMoney;

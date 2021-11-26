@@ -2,6 +2,7 @@
   <v-navigation-drawer
       :value="drawer"
       app
+      temporary
   >
     <v-list>
       <v-list-item-group>
