@@ -160,8 +160,8 @@ export const store = new Vuex.Store({
 
 
 
-        setLocalStorage(context, update) {
-            if(update) {
+        setLocalStorage(context, reset) {
+            if(reset) {
                 localStorage.clear();
 
                 localStorage.setItem('state', JSON.stringify(context.state.initialLocalStorage()));
@@ -434,7 +434,7 @@ export const store = new Vuex.Store({
         },
         */
         setLocalStorage(state) {
-            state.localStorage = localStorage.getItem('state') ? JSON.parse(localStorage.getItem('state')) : state.initialLocalStorage;
+            state.localStorage = localStorage.getItem('state') ? JSON.parse(localStorage.getItem('state')) : state.initialLocalStorage();
         },
         setDrawer(state) {
             state.drawer = !state.drawer;

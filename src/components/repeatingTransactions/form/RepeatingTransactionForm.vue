@@ -578,9 +578,14 @@ export default {
       const rhythmTypes = ['weekly', 'monthly', 'yearly'];
 
       let weekdays = [];
+      //sort weekdayIndexes (ascending)
+      let orderedWeekdayIndexes = this.weekdayIndexes.sort(function(a, b) {return a - b});
+      //console.log(this.weekdayIndexes.length);
+      //fill variable "weekdays" with weekday abbreviations (e.g. MO, DI, etc.)
       for(let i=0; i < this.weekdayIndexes.length; i++) {
-        weekdays.push(this.weekdays[this.weekdayIndexes[i]]);
+        weekdays.push(this.weekdays[orderedWeekdayIndexes[i]]);
       }
+      console.log(this.weekdayIndexes);
 
       const data = {
         item: this.$route.params.item,
@@ -656,7 +661,7 @@ export default {
   }
 
   .weekdays {
-    margin-left: 2.5%;
+
   }
 }
 

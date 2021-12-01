@@ -6,6 +6,7 @@
     <v-toolbar-title>{{ toolbarTitle }}</v-toolbar-title>
     <button @click="test">Test</button>
     <button class="newLocalStorageButton" @click="newLocalStorage">Reset localStorage</button>
+    <!-- <button class="newLocalStorageButton" @click="deleteLocalStorage">Delete localStorage</button> -->
   </v-app-bar>
 </template>
 
@@ -58,6 +59,9 @@ export default {
     },
     newLocalStorage() {
       this.$store.dispatch('setLocalStorage', true);
+    },
+    deleteLocalStorage() {
+      localStorage.removeItem('state');
     }
   }
 }

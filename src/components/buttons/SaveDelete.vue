@@ -85,4 +85,18 @@ export default {
     left: calc(75% - 28px);
   }
 
+  @media only screen and (min-width: 1264px) {
+    .delete-button {
+      position: fixed;
+      top: 90%;
+      left: calc(35% - 28px);
+    }
+
+    .save-button {
+      position: fixed;
+      top: 90%;
+      left: calc(65% - 28px);
+    }
+  }
+
 </style>
