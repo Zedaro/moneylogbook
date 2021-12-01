@@ -1,5 +1,6 @@
 import Vue from "vue";
 import VueRouter from 'vue-router';
+import { i18n } from "@/languages/lang";
 //import {store} from "@/store/store";
 
 Vue.use(VueRouter)
@@ -30,43 +31,43 @@ const routes = [
     path: '/overview',
     name: 'overview',
     component: OverviewPage,
-    meta: { title: 'Übersicht' }
+    meta: { title: i18n.t('headerTitle.moneyAccounts') }
   },
   {
     path: '/transactions',
     name: 'transactions',
     component: TransactionsPage,
-    meta: { title: 'Transaktionen' }
+    meta: { title: i18n.t('headerTitle.transactions') }
   },
   {
     path: '/transactions/:item',
     name: 'transactionForm',
     component: TransactionForm,
-    meta: { formType: 'Transaktions-Formular' }
+    meta: { formType: i18n.t('formType.transaction') }
   },
   {
     path: '/repeatingTransactions',
     name: 'repeatingTransactions',
     component: RepeatingTransactionsPage,
-    meta: { title: 'Daueraufträge' }
+    meta: { title: i18n.t('headerTitle.repeatingTransactions') }
   },
   {
     path: '/repeatingTransactions/:item',
     name: 'repeatingTransactionForm',
     component: RepeatingTransactionForm,
-    meta: { formType: 'Dauerauftrags-Formular' }
+    meta: { formType: i18n.t('formType.repeatingTransaction') }
   },
   {
     path: '/transfers',
     name: 'transfers',
     component: TransfersPage,
-    meta: { title: 'Umbuchungen' }
+    meta: { title: i18n.t('headerTitle.transfers') }
   },
   {
     path: '/transfers/:item',
     name: 'transferForm',
     component: TransferForm,
-    meta: { formType: 'Umbuchungs-Formular' }
+    meta: { formType: i18n.t('formType.transfer') }
   },
     /*
   {
@@ -85,7 +86,7 @@ const routes = [
     path: '/moneyAccounts/:item',
     name: 'moneyAccountForm',
     component: MoneyAccountForm,
-    meta: { formType: 'Konto-Formular' }
+    meta: { formType: i18n.t('formType.moneyAccount') }
     /*
     beforeEnter: (to) =>  {
       if(to.params.item == 'new') {

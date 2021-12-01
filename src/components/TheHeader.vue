@@ -7,6 +7,34 @@
     <button @click="test">Test</button>
     <button class="newLocalStorageButton" @click="newLocalStorage">Reset localStorage</button>
     <!-- <button class="newLocalStorageButton" @click="deleteLocalStorage">Delete localStorage</button> -->
+
+    <!--
+    <v-menu
+        v-model="menu"
+        :close-on-content-click="false"
+        :nudge-right="40"
+        transition="scale-transition"
+        offset-y
+        min-width="auto"
+    >
+      <template v-slot:activator="{ on, attrs }">
+        <v-text-field
+            v-model=""
+            readonly
+            v-bind="attrs"
+            v-on="on"
+        ></v-text-field>
+      </template>
+      <v-select
+          :items="languages"
+          label="Konto"
+          v-model="moneyAccount"
+      >
+
+      </v-select>
+    </v-menu>
+    -->
+
   </v-app-bar>
 </template>
 
@@ -15,7 +43,7 @@ export default {
   name: "TheHeader",
   data() {
     return {
-
+      menu: false
     }
   },
   computed: {
@@ -26,25 +54,25 @@ export default {
       }
       //Neuer Eintrag
       else if(this.$route.params.item === 'new')
-        if(this.$route.meta.formType === 'Konto-Formular') {
-          return 'Neues Konto';
-        } else if(this.$route.meta.formType === 'Transaktions-Formular') {
-          return 'Neue Transaktion';
-        } else if(this.$route.meta.formType === 'Dauerauftrags-Formular') {
-          return 'Neuer Dauerauftrag';
+        if(this.$route.meta.formType === this.$t('formType.moneyAccount')) {
+          return this.$t('headerTitle.new.moneyAccount');
+        } else if(this.$route.meta.formType === this.$t('formType.transaction')) {
+          return this.$t('headerTitle.new.transaction');
+        } else if(this.$route.meta.formType === this.$t('formType.repeatingTransaction')) {
+          return this.$t('headerTitle.new.repeatingTransaction');
         } else {
-          return 'Neue Umbuchung';
+          return this.$t('headerTitle.new.transfer');
         }
       //Eintrag bearbeiten
       else {
-        if(this.$route.meta.formType === 'Konto-Formular') {
-          return 'Konto bearbeiten';
-        } else if(this.$route.meta.formType === 'Transaktions-Formular') {
-          return 'Transaktion bearbeiten';
-        } else if(this.$route.meta.formType === 'Dauerauftrags-Formular') {
-          return 'Dauerauftrag bearbeiten';
+        if(this.$route.meta.formType === this.$t('formType.moneyAccount')) {
+          return this.$t('headerTitle.edit.moneyAccount');
+        } else if(this.$route.meta.formType === this.$t('formType.transaction')) {
+          return this.$t('headerTitle.edit.transaction');
+        } else if(this.$route.meta.formType === this.$t('formType.repeatingTransaction')) {
+          return this.$t('headerTitle.edit.repeatingTransaction');
         } else {
-          return 'Umbuchung bearbeiten';
+          return this.$t('headerTitle.edit.transfer');
         }
       }
     }

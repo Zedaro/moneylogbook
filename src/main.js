@@ -4,7 +4,6 @@
 //<editor-fold desc="Import Statements">
 import Vue from 'vue'
 import App from './App.vue'
-import VueI18n from "vue-i18n/dist/vue-i18n.esm.js";
 //</editor-fold>
 
 
@@ -44,12 +43,9 @@ import vuetify from './plugins/vuetify'
 //Keine Ahnung
 Vue.config.productionTip = false
 
-//Localization -> Vue I18n
-Vue.use(VueI18n);
-const i18n = new VueI18n({
-  locale: 'ja', // set locale
-  messages, // set locale messages
-})
+//import i18n
+import { i18n } from './languages/lang';
+
 
 
 //Vue App erstellen und rendern
