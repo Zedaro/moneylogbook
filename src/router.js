@@ -5,6 +5,8 @@ import { i18n } from "@/languages/lang";
 
 Vue.use(VueRouter)
 
+// eslint-disable-next-line no-unused-vars
+import RouterView from "@/components/RouterView";
 import OverviewPage from "@/components/OverviewPage";
 import TransactionsPage from "@/components/transactions/TransactionsPage";
 import RepeatingTransactionsPage from "@/components/repeatingTransactions/RepeatingTransactionsPage";
@@ -18,89 +20,112 @@ import TestCSS from "@/components/TestCSS";
 
 const routes = [
   {
-    path: '/',
-    redirect: { name: 'overview' }
-  },
-  {
-    path: '/testcss',
-    name: 'testcss',
-    component: TestCSS,
-    meta: { title: 'testcss' }
-  },
-  {
-    path: '/overview',
-    name: 'overview',
-    component: OverviewPage,
-    meta: { title: i18n.t('headerTitle.moneyAccounts') }
-  },
-  {
-    path: '/transactions',
-    name: 'transactions',
-    component: TransactionsPage,
-    meta: { title: i18n.t('headerTitle.transactions') }
-  },
-  {
-    path: '/transactions/:item',
-    name: 'transactionForm',
-    component: TransactionForm,
-    meta: { formType: i18n.t('formType.transaction') }
-  },
-  {
-    path: '/repeatingTransactions',
-    name: 'repeatingTransactions',
-    component: RepeatingTransactionsPage,
-    meta: { title: i18n.t('headerTitle.repeatingTransactions') }
-  },
-  {
-    path: '/repeatingTransactions/:item',
-    name: 'repeatingTransactionForm',
-    component: RepeatingTransactionForm,
-    meta: { formType: i18n.t('formType.repeatingTransaction') }
-  },
-  {
-    path: '/transfers',
-    name: 'transfers',
-    component: TransfersPage,
-    meta: { title: i18n.t('headerTitle.transfers') }
-  },
-  {
-    path: '/transfers/:item',
-    name: 'transferForm',
-    component: TransferForm,
-    meta: { formType: i18n.t('formType.transfer') }
-  },
-    /*
-  {
-    path: '/moneyAccounts/new',
-    name: 'newMoneyAccount',
-    component: NewMoneyAccount
-  },
-  {
-    path: '/moneyAccounts/edit',
-    name: 'editMoneyAccount',
-    component: NewMoneyAccount
-  },
-     */
+    path: '/:lang',
+    component: RouterView,
+    beforeEnter(to, from, next) {
+      console.log('hi');
 
-  {
-    path: '/moneyAccounts/:item',
-    name: 'moneyAccountForm',
-    component: MoneyAccountForm,
-    meta: { formType: i18n.t('formType.moneyAccount') }
-    /*
-    beforeEnter: (to) =>  {
-      if(to.params.item == 'new') {
-        this.$store.dispatch('setTitle', 'Neues Konto');
+      const lang = to.params.lang;
+
+      if(!['de', 'en'].includes(lang)) return next('de');
+
+      console.log(to);
+
+      if(i18n.locale !== lang) {
+        i18n.locale = lang;
       }
-      else {
-        this.$store.dispatch('setTitle', 'Konto bearbeiten');
+
+      return next();
+    },
+    children: [
+      {
+        path: '/',
+        redirect: 'overview'
+      },
+      {
+        path: 'testcss',
+        name: 'testcss',
+        component: TestCSS,
+        meta: { title: 'testcss' }
+      },
+      {
+        path: 'overview',
+        name: 'overview',
+        component: OverviewPage,
+        meta: { title: 'moneyAccount'  }//.t('headerTitle.moneyAccounts') }
+      },
+      {
+        path: 'transactions',
+        name: 'transactions',
+        component: TransactionsPage,
+        meta: { title: i18n.t('headerTitle.transactions') }
+      },
+      {
+        path: 'transactions/:item',
+        name: 'transactionForm',
+        component: TransactionForm,
+        meta: { formType: i18n.t('formType.transaction') }
+      },
+      {
+        path: 'repeatingTransactions',
+        name: 'repeatingTransactions',
+        component: RepeatingTransactionsPage,
+        meta: { title: i18n.t('headerTitle.repeatingTransactions') }
+      },
+      {
+        path: 'repeatingTransactions/:item',
+        name: 'repeatingTransactionForm',
+        component: RepeatingTransactionForm,
+        meta: { formType: i18n.t('formType.repeatingTransaction') }
+      },
+      {
+        path: 'transfers',
+        name: 'transfers',
+        component: TransfersPage,
+        meta: { title: i18n.t('headerTitle.transfers') }
+      },
+      {
+        path: 'transfers/:item',
+        name: 'transferForm',
+        component: TransferForm,
+        meta: { formType: i18n.t('formType.transfer') }
+      },
+      /*
+    {
+      path: '/moneyAccounts/new',
+      name: 'newMoneyAccount',
+      component: NewMoneyAccount
+    },
+    {
+      path: '/moneyAccounts/edit',
+      name: 'editMoneyAccount',
+      component: NewMoneyAccount
+    },
+       */
+
+      {
+        path: 'moneyAccounts/:item',
+        name: 'moneyAccountForm',
+        component: MoneyAccountForm,
+        meta: { formType: i18n.t('formType.moneyAccount') }
+        /*
+        beforeEnter: (to) =>  {
+          if(to.params.item == 'new') {
+            this.$store.dispatch('setTitle', 'Neues Konto');
+          }
+          else {
+            this.$store.dispatch('setTitle', 'Konto bearbeiten');
+          }
+        }
+        */
       }
-    }
-    */
+    ]
   },
   {
-    path: '/:primaryPage/:detailsPage',
-  }
+    path: '*',
+    redirect: '/de/overview'
+  },
+  
 ]
 
 export const router = new VueRouter({

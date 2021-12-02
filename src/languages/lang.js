@@ -29,7 +29,7 @@ const messages = {
             transfer: 'Umbuchungs-Formular'
         },
         languages: {
-            de: 'German',
+            de: 'Deutsch',
             en: 'English'
         }
     },
@@ -60,7 +60,7 @@ const messages = {
         },
         languages: {
             de: 'Deutsch',
-            en: 'Englisch'
+            en: 'English'
         }
     }
 }
