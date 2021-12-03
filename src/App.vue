@@ -12,7 +12,7 @@
 <script>
 import NavigationDrawer from "@/components/NavigationDrawer";
 import TheHeader from "@/components/TheHeader";
-import PlusMinus from "@/components/buttons/PlusMinus";
+import PlusMinus from "@/components/buttons/Plus";
 
 export default {
   name: 'App',

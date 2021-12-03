@@ -5,7 +5,7 @@
     <div class="colorTo" :style="{ backgroundColor: colorTo }"></div>
     <v-card-title class="card-title">{{ this.name }}</v-card-title>
     <v-card-text class="text-center grey--text">{{ this.description }}</v-card-text>
-    <v-card-text class="text-center subtitle-1 money">{{ new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(this.money) }}</v-card-text>
+    <v-card-text class="text-center subtitle-1 money">{{ $t('moneyFormat.format').format(this.money) }}</v-card-text>
     <v-card-text class="text-center grey--text">Von: {{ this.from }}</v-card-text>
     <v-card-text class="text-center grey--text">Zu: {{ this.to }}</v-card-text>
     <v-card-text class="text-center grey--text">{{ formattedDate }}</v-card-text>

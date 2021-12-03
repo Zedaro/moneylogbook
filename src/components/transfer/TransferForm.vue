@@ -22,7 +22,7 @@
           <!-- name -->
           <validation-provider :rules="{required: true, regex: true}" v-slot="{ errors }">
             <v-text-field counter="100"
-                          label="Name"
+                          :label="$t('form.name')"
                           maxlength="100"
                           v-model="name"
                           :error-messages="errors"
@@ -38,7 +38,7 @@
             >
               <template v-slot:label>
                 <div>
-                  Beschreibung <small>(optional)</small>
+                  {{ $t('form.description') }} <small>(optional)</small>
                 </div>
               </template>
             </v-textarea>
@@ -49,7 +49,7 @@
             <v-select
                 ref="from"
                 :items="selectItems"
-                label="Von"
+                :label="$t('form.from')"
                 v-model="from"
                 :error-messages="errors"
             ></v-select>
@@ -60,7 +60,7 @@
             <v-select
                 ref="to"
                 :items="selectItems"
-                label="Zu"
+                :label="$t('form.to')"
                 v-model="to"
                 :error-messages="errors"
             ></v-select>
@@ -69,9 +69,9 @@
           <!-- money -->
           <validation-provider rules="required|double|positiveFigure" v-slot="{ errors }">
             <v-text-field type="number"
-                          label="Geld"
+                          :label="$t('form.money')"
                           step="0.01"
-                          prefix="€"
+                          :prefix="$t('moneyFormat.monetaryUnit')"
                           v-model.number="money"
                           :error-messages="errors"
             ></v-text-field>
@@ -90,7 +90,7 @@
               <template v-slot:activator="{ on, attrs }">
                 <v-text-field
                     v-model="computedDateFormatted"
-                    label="Datum"
+                    :label="$t('form.date')"
                     prepend-icon="mdi-calendar"
                     readonly
                     v-bind="attrs"

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="chart-box">
-      <canvas id="doughnut-chart"></canvas>
+      <canvas id="doughnut-chart" ref="doughnutChart"></canvas>
     </div>
   </div>
 </template>
@@ -11,8 +11,19 @@
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import DoughnutLabel from 'chartjs-plugin-doughnutlabel';
+
+
+let initialChart = null;
+let configObject = null;
+let context = null
+
 export default {
   name: 'DoughnutChart',
+  data() {
+    return {
+      //chart: null
+    };
+  },
   mounted() {
 
     /*
@@ -110,7 +121,7 @@ export default {
 
     //setup / data block
     const totalMoney = this.$store.getters.getTotalMoney;
-    const formattedTotalMoney = this.$store.getters.getFormattedTotalMoney;
+    const formattedTotalMoney = this.$t('moneyFormat.format').format(totalMoney);
     const data = {
       labels: [],
       datasets: [{
@@ -150,7 +161,7 @@ export default {
 
 
     //config block
-    const config = {
+    let config = {
       type: 'doughnut',
       data: data,
       plugins: [ChartDataLabels, DoughnutLabel],
@@ -159,7 +170,7 @@ export default {
           doughnutlabel: {
             labels: [
               {
-                text: 'Gesamt',
+                text: this.totalText,
                 font: {
                   size: '50'
                 }
@@ -173,7 +184,7 @@ export default {
             ]
           }
         },
-        maintainAspectRatio: false
+        maintainAspectRatio: false,
         /*
         elements: {
           center: {
@@ -193,9 +204,54 @@ export default {
 
     //init / render block
     const ctx = document.getElementById('doughnut-chart');
-    new Chart(ctx, config);
+    //initialChart =
+    initialChart = new Chart(ctx, config);
     //
-  }
+
+    //dataObject = data;
+    configObject = config;
+    context = ctx;
+
+  },
+  computed: {
+    totalText() {
+      return this.$t('totalText');
+    },
+    locale() {
+      return this.$i18n.locale;
+    }
+  },
+  watch: {
+    locale() {
+      //console.log(this.$refs.doughnutChart);  //.config.options.plugins.doughnutlabel.text = this.totalText;
+
+      //destroy initial chart
+      initialChart.destroy();
+
+      //update inner text of chart in the config object
+      configObject.options.plugins.doughnutlabel.labels[0].text = this.$t('totalText');
+      configObject.options.plugins.doughnutlabel.labels[1].text = this.$t('moneyFormat.format').format(this.$store.getters.getTotalMoney);
+
+      //create new chart
+      new Chart(context, configObject);
+
+      /*
+      configObject.options.plugins.doughnutlabel.text = this.$t('totalText');
+
+      let chart = new Chart(context, configObject);
+      console.log(chart.options.plugins.doughnutlabel.text);
+      chart.update();
+      */
+
+
+      /*
+      console.log(this.chart);
+      this.chart.options.plugins.doughnutlabel.labels[0].text = this.totalText;
+      this.chart.update();
+      console.log(this.chart);
+      */
+    }
+  },
 }
 </script>
 

@@ -20,7 +20,7 @@
           <!-- name -->
           <validation-provider rules="required|regex" v-slot="{ errors }">
             <v-text-field counter="100"
-                        label="Name"
+                        :label="$t('form.name')"
                         maxlength="100"
                         v-model="name"
                         :error-messages="errors"
@@ -36,7 +36,7 @@
           >
             <template v-slot:label>
               <div>
-                Beschreibung <small>(optional)</small>
+                {{ $t('form.description') }} <small>(optional)</small>
               </div>
             </template>
           </v-textarea>
@@ -46,7 +46,7 @@
           <validation-provider rules="required" v-slot="{ errors }">
             <v-select
               :items="items"
-              label="Konto"
+              :label="$t('form.moneyAccount')"
               v-model="moneyAccount"
               :error-messages="errors"
           ></v-select>
@@ -55,9 +55,9 @@
           <!-- money -->
           <validation-provider rules="required|not_zero" v-slot="{ errors }">
             <v-text-field type="number"
-                        label="Geld"
+                        :label="$t('form.money')"
                         step="0.01"
-                        prefix="€"
+                        :prefix="$t('moneyFormat.monetaryUnit')"
                         v-model.number="money"
                         :error-messages="errors"
           ></v-text-field>
@@ -76,7 +76,7 @@
             <template v-slot:activator="{ on, attrs }">
               <v-text-field
                   v-model="computedDateFormatted"
-                  label="Datum"
+                  :label="$t('form.date')"
                   prepend-icon="mdi-calendar"
                   readonly
                   v-bind="attrs"
@@ -138,6 +138,7 @@ export default {
         moneyAccount: '',
         money: null,
         //color: '#000000',
+
         nameRules: nameRules,
         moneyRules: moneyRules,
         selectRules: selectRules,

@@ -8,7 +8,7 @@
           <!-- name -->
           <validation-provider rules="required|regex" v-slot="{ errors }">
             <v-text-field counter="100"
-                        label="Name"
+                        :label="$t('form.name')"
                         maxlength="100"
                         v-model="name"
                         :error-messages="errors"
@@ -18,9 +18,9 @@
           <!-- money -->
           <validation-provider rules="required|double|zero_or_positive" v-slot="{ errors }">
             <v-text-field type="number"
-                        label="Geld"
+                        :label="$t('form.money')"
                         step="0.01"
-                        prefix="€"
+                        :prefix="$t('moneyFormat.monetaryUnit')"
                         v-model.number="money"
                         :error-messages="errors"
           ></v-text-field>

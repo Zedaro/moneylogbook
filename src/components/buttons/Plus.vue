@@ -13,20 +13,20 @@
 
 <script>
   export default {
-    name: "PlusMinus",
+    name: "Plus",
     computed: {
       item() {
-        if(this.$route.meta.title === 'Übersicht') {
+        if(this.$route.meta.title === 'moneyAccounts') {
           return {
             name: 'moneyAccountForm',
             params: { item: 'new' }
           };
-        } else if(this.$route.meta.title === 'Transaktionen') {
+        } else if(this.$route.meta.title === 'transactions') {
           return {
             name: 'transactionForm',
             params: { item: 'new' }
           };
-        } else if(this.$route.meta.title === 'Daueraufträge') {
+        } else if(this.$route.meta.title === 'repeatingTransactions') {
           return {
             name: 'repeatingTransactionForm',
             params: { item: 'new' }

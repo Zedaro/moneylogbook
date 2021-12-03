@@ -1,17 +1,23 @@
 <template>
   <v-app-bar app>
-    <v-app-bar-nav-icon v-if="Object.keys($route.params).length === 1 && this.$route.params.item !== 'new'" @click="clickDrawer"></v-app-bar-nav-icon>   <!-- Object.keys($route.params).length === 0 -->
+    <v-app-bar-nav-icon v-if="Object.keys($route.params).length === 0 && this.$route.params.item !== 'new'" @click="clickDrawer"></v-app-bar-nav-icon>   <!-- Object.keys($route.params).length === 0 -->
     <v-app-bar-nav-icon v-else @click="$router.back()">
-      <v-icon>mdi-arrow-left</v-icon></v-app-bar-nav-icon>
+      <v-icon>mdi-arrow-left</v-icon>
+    </v-app-bar-nav-icon>
     <v-toolbar-title>{{ toolbarTitle }}</v-toolbar-title>
-    <button @click="test">Test</button>
-    <button class="newLocalStorageButton" @click="newLocalStorage">Reset localStorage</button>
-    <!-- <button class="newLocalStorageButton" @click="deleteLocalStorage">Delete localStorage</button> -->
+
+    <v-btn @click="test">
+      <v-icon>mdi-head-question-outline</v-icon>
+    </v-btn>
+
+    <v-btn class="newLocalStorageButton" @click="newLocalStorage">
+      <v-icon>mdi-reload</v-icon>
+    </v-btn>
 
 
     <v-menu
         v-model="menu"
-        :close-on-content-click="false"
+        :close-on-content-click="true"
         :nudge-right="40"
         transition="scale-transition"
         offset-y
@@ -23,6 +29,7 @@
             readonly
             v-bind="attrs"
             v-on="on"
+            outlined
         ></v-text-field>
       </template>
       <v-list>
@@ -49,7 +56,7 @@ export default {
   data() {
     return {
       menu: false,
-      selectedLangIndex: Object.keys(this.$t('languages')).findIndex(language => language === 'de'),
+      selectedLangIndex: Object.keys(this.$store.state.localStorage.languages).findIndex(language => language === 'de'),
     }
   },
   computed: {
@@ -57,10 +64,16 @@ export default {
       //Übersichts-Seiten
       if(this.$route.meta.title) {
         //return this.$t('headerTitle[this.$route.params.lang]');
-        return this.$route.meta.title;
+        //return this.$route.meta.title;
+        return this.$t('headerTitle')[this.$route.meta.title];
+        //const titles = Object.keys(this.$t('headerTitle'));
+        //return titles.find(title => title === this.$route.meta.title);
       }
       //Neuer Eintrag
       else if(this.$route.params.item === 'new') {
+
+        return this.$t('headerTitle.new')[this.$route.meta.formType];
+        /*
         if(this.$route.meta.formType === this.$t('formType.moneyAccount')) {
           return this.$t('headerTitle.new.moneyAccount');
         } else if(this.$route.meta.formType === this.$t('formType.transaction')) {
@@ -70,9 +83,14 @@ export default {
         } else {
           return this.$t('headerTitle.new.transfer');
         }
+        */
       }
       //Eintrag bearbeiten
       else {
+
+        return this.$t('headerTitle.edit')[this.$route.meta.formType];
+
+        /*
         if(this.$route.meta.formType === this.$t('formType.moneyAccount')) {
           return this.$t('headerTitle.edit.moneyAccount');
         } else if(this.$route.meta.formType === this.$t('formType.transaction')) {
@@ -82,13 +100,14 @@ export default {
         } else {
           return this.$t('headerTitle.edit.transfer');
         }
+        */
       }
     },
     languages() {
-      return Object.values(this.$t('languages'));
+      return Object.values(this.$store.state.localStorage.languages);
     },
     languageAbbreviations() {
-      return Object.keys(this.$t('languages'));
+      return Object.keys(this.$store.state.localStorage.languages);
     },
     selectedLangText() {
       return this.languages[this.selectedLangIndex];
@@ -112,16 +131,16 @@ export default {
       localStorage.removeItem('state');
     },
     changeLanguage() {
-      this.$root.$i18n.locale = this.selectedLangAbbreviation;
+      this.$i18n.locale = this.selectedLangAbbreviation;
     }
   },
   watch: {
     selectedLangIndex() {
-      console.log(this.$i18n.locale);
+      //console.log(this.$i18n.locale);
       this.changeLanguage();
-      console.log(this.$i18n.locale);
-      console.log(this.$t('headerTitle.moneyAccounts'));
-      console.log(this.$route.meta.title);
+      //console.log(this.$i18n.locale);
+      //console.log(this.$t('headerTitle.moneyAccounts'));
+      //console.log(this.$route.meta.title);
       //this.changeLanguage();
     }
   }
@@ -133,6 +152,16 @@ export default {
   .newLocalStorageButton {
     border: solid black 1px;
     margin-left: 10px;
+  }
+
+  .v-text-field {
+    max-width: fit-content;
+  }
+
+  .v-input {
+    left: 100px;
+    /*justify-self: flex-end;
+    align-self: center; */
   }
 
 </style>

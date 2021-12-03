@@ -8,7 +8,7 @@
     <!-- <v-card-text class="text-center grey--text description">{{ this.description }}</v-card-text> -->
 
     <div class="money-div">
-      <v-card-text class="text-center money" :class="moneyColor">{{ new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(this.money) }}</v-card-text>
+      <v-card-text class="text-center money" :class="moneyColor">{{ $t('moneyFormat.format').format(this.money) }}</v-card-text>
     </div>
 
     <div class="money-account-div">

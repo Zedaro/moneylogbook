@@ -4,7 +4,7 @@
     <div class="color" :style="{ backgroundColor: color }"></div>
     <v-card-title class="card-title">{{ this.name }}</v-card-title>
     <v-card-text class="text-center grey--text">{{ this.description }}</v-card-text>
-    <v-card-text class="text-center subtitle-1 money" :class="moneyColor">{{ new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(this.money) }}</v-card-text>
+    <v-card-text class="text-center subtitle-1 money" :class="moneyColor">{{ $t('moneyFormat.format').format(this.money) }}</v-card-text>
     <v-card-text class="text-center grey--text">{{ this.moneyAccount }}</v-card-text>
     <v-card-text class="text-center grey--text">{{ this.rhythmText }}</v-card-text>
     <v-card-text class="text-center grey--text">{{ formattedDate(startingDate) }} - {{ formattedDate(endingDate) }}</v-card-text>

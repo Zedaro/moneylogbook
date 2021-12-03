@@ -9,6 +9,11 @@ export const store = new Vuex.Store({
         drawer: false,
         initialLocalStorage: ( () => {
             let obj = {
+                languages: {
+                    de: 'Deutsch',
+                    "en-US": 'English (US)',
+                    "en-GB": 'English (GB)'
+                },
                 toolbarTitle: 'Übersicht',
                 moneyAccounts: [
                     {
@@ -134,9 +139,6 @@ export const store = new Vuex.Store({
             return state.localStorage.totalMoney;
         },
 
-        getFormattedTotalMoney(state) {
-            return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(state.localStorage.totalMoney)
-        },
         getMoneyAccountNames(state) {
             let names = [];
             state.localStorage.moneyAccounts.forEach( (account) => names.push(account.name) );

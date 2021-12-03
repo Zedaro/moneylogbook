@@ -2,7 +2,7 @@
   <div>
     <doughnut-chart></doughnut-chart>
     <v-card class="list-item">
-      <v-card-title id="card-title">Gesamt</v-card-title>
+      <v-card-title id="card-title">{{ $t('totalText') }}</v-card-title>
       <v-card-text class="text-center">{{ totalMoney }}</v-card-text>
     </v-card>
     <money-accounts-list></money-accounts-list>
@@ -20,7 +20,8 @@ export default {
   components: { DoughnutChart, MoneyAccountsList },
   computed: {
     totalMoney() {
-        return this.$store.getters.getFormattedTotalMoney;
+        let totalMoney = this.$store.getters.getTotalMoney;
+        return this.$t('moneyFormat.format').format(totalMoney);
       //this.money.replace(/\./g, ',') €
     }
   },

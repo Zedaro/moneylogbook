@@ -8,7 +8,7 @@
           <!-- name -->
           <validation-provider rules="required|regex" v-slot="{ errors }">
             <v-text-field counter="100"
-                          label="Name"
+                          :label="$t('form.name')"
                           maxlength="100"
                           v-model="name"
                           :error-messages="errors"
@@ -24,17 +24,17 @@
             >
               <template v-slot:label>
                 <div>
-                  Beschreibung <small>(optional)</small>
+                  {{ $t('form.description') }} <small>(optional)</small>
                 </div>
               </template>
             </v-textarea>
           </validation-provider>
 
-          <!-- moneyAccounts -->
+          <!-- moneyAccount -->
           <validation-provider rules="required" v-slot="{ errors }">
             <v-select
                 :items="items"
-                label="Konto"
+                :label="$t('form.moneyAccount')"
                 v-model="moneyAccount"
                 :error-messages="errors"
             ></v-select>
@@ -43,9 +43,9 @@
           <!-- money -->
           <validation-provider rules="required|not_zero" v-slot="{ errors }">
             <v-text-field type="number"
-                          label="Geld"
+                          :label="$t('form.money')"
                           step="0.01"
-                          prefix="€"
+                          :prefix="$t('moneyFormat.monetaryUnit')"
                           v-model.number="money"
                           :error-messages="errors"
             ></v-text-field>
@@ -65,7 +65,7 @@
               <template v-slot:activator="{ on, attrs }">
                 <v-text-field
                     v-model="computedStartingDateFormatted"
-                    label="Erste Ausführung"
+                    :label="$t('form.startingDate')"
                     prepend-icon="mdi-calendar"
                     readonly
                     v-bind="attrs"
@@ -85,18 +85,9 @@
             </v-menu>
           </validation-provider>
 
+          <!-- Interval -->
           <div class="rhythm-div">
-            <!-- rhythmNumber -->
-            <!-- rhythmNumber
-            <v-text-field type="number"
-                          :label="rhythmNumberLabel"
-                          step="1"
-                          min="1"
-                          max="12"
-                          v-model.number="rhythmNumber"
-                          :rules="this.rhythmNumberRules"
-            ></v-text-field>
-            -->
+            <!-- rhythmNumber-->
             <validation-provider rules="required" v-slot="{ errors }">
               <v-menu
                   v-model="menuRhythmNumber"
@@ -111,7 +102,7 @@
                   <v-text-field
                       class="rhythm-number"
                       :value="rhythmNumbers[rhythmNumberIndex]"
-                      label="Intervall"
+                      :label="$t('form.interval')"
                       readonly
                       v-bind="attrs"
                       v-on="on"
@@ -174,24 +165,6 @@
                 </v-list>
               </v-menu>
             </validation-provider>
-            <!--
-            <v-select
-                :items="rhythmNumbers"
-                value="Monat"
-                v-model="rhythmNumber"
-                :rules="this.rhythmTypeRules"
-            ></v-select>
-            -->
-
-            <!--
-            <v-select
-                :items="rhythmTypes"
-                label="Rhythmus"
-                value="Monate"
-                v-model="rhythmType"
-                :rules="this.rhythmTypeRules"
-            ></v-select>
-            -->
 
             <!-- weekdays -->
             <validation-provider v-if="rhythmTypeIndex === 0" rules="required" v-slot="{ errors, validated, invalid }">
@@ -211,17 +184,6 @@
                 </v-chip>
               </v-chip-group>
             </validation-provider>
-
-            <!--
-            <v-select
-                v-if="rhythmTypeIndex === 0"
-                :items="weekdays"
-                label="Rhythmus"
-                value="Monate"
-                v-model="weekdayIndexes"
-                :rules="this.rhythmTypeRules"
-            ></v-select>
-            -->
           </div>
 
           <!-- last date -->
@@ -236,7 +198,7 @@
             <template v-slot:activator="{ on, attrs }">
               <v-text-field
                   v-model="computedEndingDateFormatted"
-                  label="Letzte Ausführung / Enddatum (optional)"
+                  :label="$t('form.endingDate')"
                   prepend-icon="mdi-calendar"
                   readonly
                   v-bind="attrs"
@@ -279,60 +241,7 @@ export default {
   components: { SaveDelete, ValidationObserver, ValidationProvider },
   data() {
 
-
-    //<editor-fold desc="Rules">
-    const nameRules = [
-      v => !!v || "Geben Sie bitte einen Namen an"
-    ];
-    const moneyRules = [
-      v => !!v || "Geben Sie bitte einen Betrag an"
-    ];
-    const selectRules = [
-      v => !!v || "Geben Sie bitte ein Konto an"
-    ];
-    const endingDateRules = [
-      () => {
-          if(this.endingDate !== '') {
-            const startingDateParts = this.startingDate.split('-');
-            const endingDateParts = this.endingDate.split('-');
-            if( endingDateParts[0] < startingDateParts[0]  ||  (endingDateParts[0] == startingDateParts[0] && endingDateParts[1] < startingDateParts[1])  ||  (endingDateParts[0] == startingDateParts[0] && endingDateParts[1] == startingDateParts[1] && endingDateParts[2] < startingDateParts[2]) ) {
-              return "Das Enddatum darf nicht kleiner sein als das Startdatum";
-            }
-          }
-          return true;
-        },
-      /*
-      () => {
-          if(this.endingDate !== '') {
-            let today = (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10);
-            const todayParts = today.split('-');
-            console.log(todayParts);
-            const endingDateParts = this.endingDate.split('-');
-            if( endingDateParts[0] < todayParts[0]  ||  (endingDateParts[0] == todayParts[0] && endingDateParts[1] < todayParts[1])  ||  (endingDateParts[0] == todayParts[0] && endingDateParts[1] == todayParts[1] && endingDateParts[2] < todayParts[2]) ) {
-              return "Das Enddatum darf nicht vor dem heutigen sein";
-            }
-          }
-          return true;
-        }
-      */
-    ];
-    const rhythmNumberRules = [
-      v => !!v || "Geben Sie bitte eine Zahl",
-      v => (v >= 1  &&  v <= 12) || "Geben Sie bitte eine Zahl zwischen 1 und 12 an"
-    ];
-    const rhythmTypeRules = [
-      v => !!v || "Geben Sie bitte einen Rhythmus an"
-    ];
-    /*const rhythmTypes = [
-        "Wochen",
-        "Monat",
-        "Jahre"
-    ]
-    */
-    //</editor-fold>
-
-
-    const weekdays = ['MO', 'DI', 'MI', 'DO', 'FR', 'SA', 'SO'];
+    const weekdays = this.$t('form.weekdays');
 
     if (this.$route.params.item === 'new') {
       return {
@@ -346,13 +255,6 @@ export default {
         rhythmTypeIndex: 1,
         weekdays: weekdays,
         weekdayIndexes: [],
-
-        nameRules: nameRules,
-        moneyRules: moneyRules,
-        selectRules: selectRules,
-        rhythmNumberRules: rhythmNumberRules,
-        rhythmTypeRules: rhythmTypeRules,
-        endingDateRules: endingDateRules,
 
         startingDate: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
         endingDate: '',//(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
@@ -398,13 +300,6 @@ export default {
         weekdays: weekdays,
         weekdayIndexes: weekdayIndexes,
         //rhythmTypes: rhythmTypes,
-
-        nameRules: nameRules,
-        moneyRules: moneyRules,
-        selectRules: selectRules,
-        rhythmNumberRules: rhythmNumberRules,
-        rhythmTypeRules: rhythmTypeRules,
-        endingDateRules: endingDateRules,
 
         menuStart: false,
         menuEnd: false,
