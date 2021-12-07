@@ -58,7 +58,6 @@ const messages = {
                     rhythmNumbers.push("Alle " + i + ' ');
                 }
 
-                //const rhythmNumbers = [1, 2, 3];
                 return rhythmNumbers;
             },
             rhythmTypes: (ctx) => {
@@ -154,6 +153,7 @@ const messages = {
             format: () => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
         }
     },
+    /*
     "en-GB": {
         headerTitle: {
             moneyAccounts: 'Overview',
@@ -198,6 +198,7 @@ const messages = {
             format: () => new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' })
         }
     }
+    */
 }
 
 Vue.use(VueI18n);

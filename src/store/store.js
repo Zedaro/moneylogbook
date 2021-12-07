@@ -52,7 +52,7 @@ export const store = new Vuex.Store({
                         startingDate: '2021-11-20',
                         endingDate: '2021-12-20',
                         rhythmNumber: 1,
-                        rhythmType: 'monthly',
+                        rhythmType: 1,
                         weekdays: null,
                         rhythmText: 'Jeden Monat'
                     }

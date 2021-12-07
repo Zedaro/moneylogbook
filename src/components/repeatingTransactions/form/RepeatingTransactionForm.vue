@@ -262,7 +262,7 @@ export default {
       };
     }
     else {
-      //rhythmTypeIndex bestimmen
+      /*
       const rhythmType = this.$store.getters.getRepeatingTransactions[this.$route.params.item].rhythmType;
       let rhythmTypeIndex = null;
       if(rhythmType === 'weekly') {
@@ -272,7 +272,7 @@ export default {
       } else {
         rhythmTypeIndex = 2;
       }
-
+      */
       return {
         new: false,
         name: (this.$store.getters.getRepeatingTransactions[this.$route.params.item].name),
@@ -283,8 +283,8 @@ export default {
         startingDate: (this.$store.getters.getRepeatingTransactions[this.$route.params.item].startingDate),
         endingDate: (this.$store.getters.getRepeatingTransactions[this.$route.params.item].endingDate),
 
-        rhythmNumberIndex: (this.$store.getters.getRepeatingTransactions[this.$route.params.item].rhythmNumber - 1),
-        rhythmTypeIndex: rhythmTypeIndex,
+        rhythmNumberIndex: (this.$store.getters.getRepeatingTransactions[this.$route.params.item].rhythmNumber), //- 1),
+        rhythmTypeIndex: this.$store.getters.getRepeatingTransactions[this.$route.params.item].rhythmType,
         weekdayIndexes: this.$store.getters.getRepeatingTransactions[this.$route.params.item].weekdays,
 
         menuStart: false,
@@ -367,7 +367,7 @@ export default {
         rhythmNumbers.push(i+1);
       }
 
-      const rhythmTypes = ['weekly', 'monthly', 'yearly'];
+      //const rhythmTypes = ['weekly', 'monthly', 'yearly'];
 
       let orderedWeekdayIndexes = this.weekdayIndexes.sort(function(a, b) {return a - b});
 
@@ -382,8 +382,8 @@ export default {
         money: parseFloat(this.money.toFixed(2)),   //.replace(/\./g, ','),
         startingDate: this.startingDate,
         endingDate: this.endingDate,
-        rhythmNumber: rhythmNumbers[this.rhythmNumberIndex],
-        rhythmType: rhythmTypes[this.rhythmTypeIndex],
+        rhythmNumber: this.rhythmNumberIndex,
+        rhythmType: this.rhythmTypeIndex,
         weekdays: (this.weekdayIndexes.length == 0) ? null : orderedWeekdayIndexes,//weekdays,
         rhythmText: this.rhythmNumbers[this.rhythmNumberIndex] + this.rhythmTypes[this.rhythmTypeIndex]
         //color: this.color

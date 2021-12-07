@@ -6,7 +6,7 @@
     <v-card-text class="text-center grey--text">{{ this.description }}</v-card-text>
     <v-card-text class="text-center subtitle-1 money" :class="moneyColor">{{ $t('moneyFormat.format').format(this.money) }}</v-card-text>
     <v-card-text class="text-center grey--text">{{ this.moneyAccount }}</v-card-text>
-    <v-card-text class="text-center grey--text">{{ this.rhythmText }}</v-card-text>
+    <v-card-text class="text-center grey--text">{{ rhythmText }}</v-card-text>
     <v-card-text class="text-center grey--text">{{ formattedDate(startingDate) }} - {{ formattedDate(endingDate) }}</v-card-text>
   </v-card>
 
@@ -17,7 +17,7 @@
 <script>
 export default {
   name: "RepeatingTransactionItem",
-  props: ['color', 'name', 'description', 'money', 'moneyAccount', 'startingDate', 'endingDate', 'rhythmNumber', 'rhythmType', 'rhythmText', 'index'],
+  props: ['color', 'name', 'description', 'money', 'moneyAccount', 'startingDate', 'endingDate', 'rhythmNumber', 'rhythmType', 'index'],
   computed: {
     moneyAccountsExist() {
       const account = this.$store.getters.getMoneyAccounts.find(account => account.name === this.moneyAccount);
@@ -33,6 +33,9 @@ export default {
     },
     moneyColor() {
       return ( (this.money > 0) ? 'green--text' : 'red--text' );
+    },
+    rhythmText() {
+      return (this.$t('form.rhythmNumbers', { rhythmTypeIndex: this.rhythmTypeIndex })[this.rhythmNumber] + " " + this.$t('form.rhythmTypes', { rhythmNumberIndex: this.rhythmNumber })[this.rhythmType]);
     },
     formattedDate() {
       return (date) => {
