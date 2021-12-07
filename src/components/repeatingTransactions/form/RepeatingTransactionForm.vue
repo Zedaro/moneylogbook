@@ -203,7 +203,6 @@
                   readonly
                   v-bind="attrs"
                   v-on="on"
-                  :rules="endingDateRules"
               ></v-text-field>
             </template>
             <v-date-picker
@@ -241,8 +240,6 @@ export default {
   components: { SaveDelete, ValidationObserver, ValidationProvider },
   data() {
 
-    const weekdays = this.$t('form.weekdays');
-
     if (this.$route.params.item === 'new') {
       return {
         new: true,
@@ -253,11 +250,10 @@ export default {
         money: null,
         rhythmNumberIndex: 0,
         rhythmTypeIndex: 1,
-        weekdays: weekdays,
         weekdayIndexes: [],
 
         startingDate: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-        endingDate: '',//(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+        endingDate: '',
 
         menuStart: false,
         menuEnd: false,
@@ -277,14 +273,6 @@ export default {
         rhythmTypeIndex = 2;
       }
 
-      const selectedWeekdays = this.$store.getters.getRepeatingTransactions[this.$route.params.item].weekdays;
-      let weekdayIndexes = []
-      if(selectedWeekdays != null) {
-        for(let i=0; i < selectedWeekdays.length; i++) {
-          weekdayIndexes.push(weekdays.findIndex( (weekday) => weekday == selectedWeekdays[i] ));
-        }
-      }
-
       return {
         new: false,
         name: (this.$store.getters.getRepeatingTransactions[this.$route.params.item].name),
@@ -297,9 +285,7 @@ export default {
 
         rhythmNumberIndex: (this.$store.getters.getRepeatingTransactions[this.$route.params.item].rhythmNumber - 1),
         rhythmTypeIndex: rhythmTypeIndex,
-        weekdays: weekdays,
-        weekdayIndexes: weekdayIndexes,
-        //rhythmTypes: rhythmTypes,
+        weekdayIndexes: this.$store.getters.getRepeatingTransactions[this.$route.params.item].weekdays,
 
         menuStart: false,
         menuEnd: false,
@@ -322,89 +308,15 @@ export default {
 
   },
   computed: {
-    /*
-    rhythmNumberLabel() {
-      let word = "";
-      if(this.rhythmType === "Woche") {
-        word = "Jede ";
-      } else if(this.rhythmType === "Monat") {
-        word = "Jeden ";
-      } else if(this.rhythmType === "Jahr") {
-        word = "Jedes ";
-      } else {
-        word = "Alle ";
-      }
-      return word;
-      //return (this.rhythmNumber == 1) ? ;
-    },
-    */
-
     rhythmNumbers() {
-      let every = "";
-      if(this.rhythmTypeIndex === 0) {
-        every = "Jede ";
-      } else if(this.rhythmTypeIndex === 1) {
-        every = "Jeden ";
-      } else if(this.rhythmTypeIndex === 2) {
-        every = "Jedes ";
-      }
-
-      const rhythmNumbers = [every];
-      for(let i = 2; i <= 12; i++) {
-        rhythmNumbers.push("Alle " + i + ' ');
-      }
-
-      //const rhythmNumbers = [1, 2, 3];
-      return rhythmNumbers;
+      return this.$t('form.rhythmNumbers', { rhythmTypeIndex: this.rhythmTypeIndex });
     },
-    /*
-    selectedRhythmNumberComputed() {
-      if(this.rhythmNumberIndex === 0) {
-        if(this.rhythmTypeIndex === 0) {
-          return "Jede";
-        } else if(this.rhythmTypeIndex === 1) {
-          return "Jeden";
-        } else {
-          return "Jedes";
-        }
-      } else {
-        return this.rhythmNumberItems[this.rhythmNumberIndex];
-      }
-    },
-    */
     rhythmTypes() {
-      if(this.rhythmNumberIndex === 0) {
-        return [
-          "Woche",
-          "Monat",
-          "Jahr"
-        ];
-      } else {
-        return [
-          "Wochen",
-          "Monate",
-          "Jahre"
-        ];
-      }
+      return this.$t('form.rhythmTypes', { rhythmNumberIndex: this.rhythmNumberIndex });
     },
-    /*
-    selectedRhythmTypeComputed() {
-
-
-      if(this.rhythmNumberIndex === 1) {
-        return "Jede";
-      } else if(this.rhythmTypeIndex === 2) {
-        return "Jeden";
-      } else {
-        return "Jedes";
-      }
-    },
-    */
-    /*
     weekdays() {
-      return ['MO', 'DI', 'MI', 'DO', 'FR', 'SA', 'SO'];
+      return this.$t('form.weekdays');
     },
-    */
     computedStartingDateFormatted() {
       return this.formatDate(this.startingDate);
     },
@@ -450,21 +362,6 @@ export default {
       return `${day}.${month}.${year}`;
     },
     saveData() {
-        /*
-        if(typeof this.money == 'string') {
-          this.money = parseFloat(this.money);
-        }
-        */
-        /*
-        const rhythmNumbers = () => {
-          let arr = [];
-          for(let i=0; i < 12; i++) {
-            arr.push(i+1);
-          }
-          return arr;
-        };
-        */
-
       let rhythmNumbers = [];
       for(let i=0; i < 12; i++) {
         rhythmNumbers.push(i+1);
@@ -472,14 +369,8 @@ export default {
 
       const rhythmTypes = ['weekly', 'monthly', 'yearly'];
 
-      let weekdays = [];
-      //sort weekdayIndexes (ascending)
       let orderedWeekdayIndexes = this.weekdayIndexes.sort(function(a, b) {return a - b});
-      //console.log(this.weekdayIndexes.length);
-      //fill variable "weekdays" with weekday abbreviations (e.g. MO, DI, etc.)
-      for(let i=0; i < this.weekdayIndexes.length; i++) {
-        weekdays.push(this.weekdays[orderedWeekdayIndexes[i]]);
-      }
+
       console.log(this.weekdayIndexes);
 
       const data = {
@@ -493,12 +384,12 @@ export default {
         endingDate: this.endingDate,
         rhythmNumber: rhythmNumbers[this.rhythmNumberIndex],
         rhythmType: rhythmTypes[this.rhythmTypeIndex],
-        weekdays: (this.weekdayIndexes.length == 0) ? null : weekdays,
+        weekdays: (this.weekdayIndexes.length == 0) ? null : orderedWeekdayIndexes,//weekdays,
         rhythmText: this.rhythmNumbers[this.rhythmNumberIndex] + this.rhythmTypes[this.rhythmTypeIndex]
         //color: this.color
       };
 
-      console.log(weekdays);
+      console.log(orderedWeekdayIndexes);
 
       this.$store.dispatch('saveRepeatingTransaction', data)
           .then(() => {

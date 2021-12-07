@@ -6,46 +6,51 @@
     </v-app-bar-nav-icon>
     <v-toolbar-title>{{ toolbarTitle }}</v-toolbar-title>
 
-    <v-btn @click="test">
-      <v-icon>mdi-head-question-outline</v-icon>
-    </v-btn>
+    <div class="buttons-div">
 
-    <v-btn class="newLocalStorageButton" @click="newLocalStorage">
-      <v-icon>mdi-reload</v-icon>
-    </v-btn>
+      <v-btn @click="test" class="test-btn my-auto" fab depressed>
+        <v-icon>mdi-head-question-outline</v-icon>
+      </v-btn>
 
+      <v-btn class="newLocalStorageButton my-auto" @click="newLocalStorage" fab depressed>
+        <v-icon>mdi-reload</v-icon>
+      </v-btn>
 
-    <v-menu
-        v-model="menu"
-        :close-on-content-click="true"
-        :nudge-right="40"
-        transition="scale-transition"
-        offset-y
-        min-width="auto"
-    >
-      <template v-slot:activator="{ on, attrs }">
-        <v-text-field
-            v-model="selectedLangText"
-            readonly
-            v-bind="attrs"
-            v-on="on"
-            outlined
-        ></v-text-field>
-      </template>
-      <v-list>
-        <v-list-item-group
-            v-model="selectedLangIndex"
-            mandatory
-        >
-          <v-list-item
-            v-for="(language, index) in languages"
-            :key="index"
+      <v-menu
+          v-model="menu"
+          :close-on-content-click="true"
+          :nudge-right="40"
+          transition="scale-transition"
+          offset-y
+          min-width="auto"
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <v-text-field
+              v-model="selectedLangText"
+              readonly
+              v-bind="attrs"
+              v-on="on"
+              outlined
+              class="my-auto"
+          ></v-text-field>
+        </template>
+        <v-list>
+          <v-list-item-group
+              v-model="selectedLangIndex"
+              mandatory
           >
-            <v-list-item-title>{{ language }}</v-list-item-title>
-          </v-list-item>
-        </v-list-item-group>
-      </v-list>
-    </v-menu>
+            <v-list-item
+                v-for="(language, index) in languages"
+                :key="index"
+            >
+              <v-list-item-title>{{ language }}</v-list-item-title>
+            </v-list-item>
+          </v-list-item-group>
+        </v-list>
+      </v-menu>
+
+    </div>
+
 
   </v-app-bar>
 </template>
@@ -150,18 +155,32 @@ export default {
 <style scoped>
 
   .newLocalStorageButton {
-    border: solid black 1px;
-    margin-left: 10px;
+    /*border: solid black 1px;*/
+  }
+
+  .test-btn {
+
+  }
+
+  .buttons-div {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: flex-end;
   }
 
   .v-text-field {
     max-width: fit-content;
+    height: 100%;
   }
 
-  .v-input {
-    left: 100px;
-    /*justify-self: flex-end;
-    align-self: center; */
+  .v-input__slot {
+
+  }
+
+  .v-toolbar__title {
+    width: fit-content;
+    margin: 1px;
   }
 
 </style>

@@ -34,7 +34,8 @@ const messages = {
         form: {
             name: 'Name',
             description: 'Beschreibung',
-            money: 'Geldstand',
+            balance: 'Geldstand',
+            money: 'Betrag',
             moneyAccount: 'Konto',
             from: 'Von',
             to: 'Zu',
@@ -42,7 +43,41 @@ const messages = {
             startingDate: 'Erste Ausführung',
             endingDate: 'Letzte Ausführung / Enddatum',
             interval: 'Intervall',
-            weekdays: ['MO', 'DI', 'MI', 'DO', 'FR', 'SA', 'SO']
+            rhythmNumbers: (ctx) => {
+                let every = "";
+                if(ctx.named('rhythmTypeIndex') === 0) {
+                    every = "Jede ";
+                } else if(ctx.named('rhythmTypeIndex') === 1) {
+                    every = "Jeden ";
+                } else if(ctx.named('rhythmTypeIndex') === 2) {
+                    every = "Jedes ";
+                }
+
+                const rhythmNumbers = [every];
+                for(let i = 2; i <= 12; i++) {
+                    rhythmNumbers.push("Alle " + i + ' ');
+                }
+
+                //const rhythmNumbers = [1, 2, 3];
+                return rhythmNumbers;
+            },
+            rhythmTypes: (ctx) => {
+                if(ctx.named('rhythmNumberIndex') === 0) {
+                    return [
+                        "Woche",
+                        "Monat",
+                        "Jahr"
+                    ];
+                } else {
+                    return [
+                        "Wochen",
+                        "Monate",
+                        "Jahre"
+                    ];
+                }
+            },
+            weekdays: ['MO', 'DI', 'MI', 'DO', 'FR', 'SA', 'SO'],
+
         },
         moneyFormat: {
             monetaryUnit: '€',
@@ -78,7 +113,8 @@ const messages = {
         form: {
             name: 'Name',
             description: 'Description',
-            money: 'Balance',
+            balance: 'Balance',
+            money: 'Figure',
             moneyAccount: 'Account',
             from: 'From',
             to: 'To',
@@ -86,6 +122,31 @@ const messages = {
             startingDate: 'First Execution / Starting Date',
             endingDate: 'Last Execution / Ending Date (optional)',
             interval: 'Interval',
+            rhythmNumbers: () => {
+                let every = "Every";
+
+                const rhythmNumbers = [every];
+                for(let i = 2; i <= 12; i++) {
+                    rhythmNumbers.push("Every " + i + ' ');
+                }
+
+                return rhythmNumbers;
+            },
+            rhythmTypes: (ctx) => {
+                if(ctx.named('rhythmNumberIndex') === 0) {
+                    return [
+                        "week",
+                        "month",
+                        "year"
+                    ];
+                } else {
+                    return [
+                        "weeks",
+                        "months",
+                        "years"
+                    ];
+                }
+            },
             weekdays: ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
         },
         moneyFormat: {

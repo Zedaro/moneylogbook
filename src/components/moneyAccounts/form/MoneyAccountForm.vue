@@ -18,7 +18,7 @@
           <!-- money -->
           <validation-provider rules="required|double|zero_or_positive" v-slot="{ errors }">
             <v-text-field type="number"
-                        :label="$t('form.money')"
+                        :label="$t('form.balance')"
                         step="0.01"
                         :prefix="$t('moneyFormat.monetaryUnit')"
                         v-model.number="money"
