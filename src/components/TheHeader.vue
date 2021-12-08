@@ -169,6 +169,10 @@ export default {
     justify-content: flex-end;
   }
 
+  .v-input {
+
+  }
+
   .v-text-field {
     max-width: fit-content;
     height: 100%;
@@ -181,6 +185,7 @@ export default {
   .v-toolbar__title {
     width: fit-content;
     margin: 1px;
+    overflow: visible;
   }
 
 </style>
