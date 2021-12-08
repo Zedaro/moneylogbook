@@ -1,7 +1,7 @@
 import Vuex from "vuex"
 import Vue from "vue";
+import { i18n } from "../languages/lang";
 Vue.use(Vuex)
-
 
 
 export const store = new Vuex.Store({
@@ -211,7 +211,7 @@ export const store = new Vuex.Store({
                 const newBalance = parseFloat( ( balance + data.money ).toFixed(2) )
 
                 if(newBalance < 0) {
-                    return "Wenn Sie diese Transaktion durchführen würden, würde der Kontostand negativ werden. Bitte geben Sie einen anderen Geldbetrag an.";
+                    return i18n.t('form.errorMessages.new.transaction', {account: ''});
                 }
                 else {
                     data.newBalance = newBalance;
@@ -230,7 +230,7 @@ export const store = new Vuex.Store({
                     const newBalance = parseFloat( ( balance + (data.money - data.oldTransaction.money) ).toFixed(2) )
 
                     if(newBalance < 0) {
-                        return "Wenn Sie diese Transaktion durchführen würden, würde der Kontostand negativ werden. Bitte geben Sie einen anderen Geldbetrag an.";
+                        return i18n.t('form.errorMessages.edited.transaction', { account: '' });
                     }
                     else {
                         data.newBalance = newBalance;

@@ -75,6 +75,35 @@ const messages = {
                     ];
                 }
             },
+            errorMessages: {
+                title: 'Fehler',
+                new: {
+                    transaction: 'Wenn Sie diese Transaktion durchführen würden, würde der Kontostand negativ werden. Bitte geben Sie einen anderen Geldbetrag an.',
+                    transfer: 'Würden Sie diese Umbuchung durchführen, würde der Kontostand des Kontos, von dem Sie umbuchen wollen, negativ werden. Bitte geben Sie einen anderen Geldbetrag an.'
+                },
+                edited: {
+                    transaction: {
+                        sameMoneyAccount: 'Wenn Sie diese Transaktion durchführen würden, würde der Kontostand negativ werden. Bitte geben Sie einen anderen Geldbetrag an.',
+                        differentMoneyAccount: {
+                            oldMoneyAccountNegative: 'Wenn Sie diese Transaktion durchführen würden, würde der alte Kontostand negativ werden. Bitte geben Sie einen anderen Geldbetrag an.',
+                            newMoneyAccountNegative: 'Wenn Sie diese Transaktion durchführen würden, würde der neue Kontostand negativ werden. Bitte geben Sie einen anderen Geldbetrag oder ein anderes Konto an.'
+                        }
+                    },
+                    transfer: {
+                        sameMoneyAccounts: 'Würden Sie diese Umbuchung durchführen, würde der Kontostand des Kontos, von dem Sie umbuchen wollen, negativ werden. Bitte geben Sie einen anderen Geldbetrag an.',
+                        differentFrom: {
+                            newFromNegative: 'Würden Sie diese Umbuchung durchführen, würde der Kontostand des neuen Kontos, von dem Sie umbuchen wollen, negativ werden. Bitte geben Sie einen anderen Geldbetrag oder ein anderes Konto an.'
+                        },
+                        differentTo: {
+                            oldToNegative: 'Würden Sie diese Umbuchung durchführen, würde der Kontostand des alten Kontos, auf das Sie umgebucht haben, negativ werden. Bitte geben Sie einen anderen Geldbetrag oder ein anderes Konto an.'
+                        }
+                    }
+                },
+                delete: {
+                    transaction: 'Wenn Sie diese Transaktion löschen würden, würde der Kontostand negativ werden.',
+                    transfer: 'Würden Sie diese Umbuchung löschen, würde der Kontostand des Kontos, auf das Sie umgebucht haben, negativ werden.'
+                }
+            },
             weekdays: ['MO', 'DI', 'MI', 'DO', 'FR', 'SA', 'SO'],
 
         },
@@ -146,7 +175,37 @@ const messages = {
                     ];
                 }
             },
-            weekdays: ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+            weekdays: ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'],
+            errorMessages: {
+                title: 'Error',
+                new: {
+                    transaction: 'If you would perform this transaction, the account balance would become negative. Please specify a different amount of money.',
+                    transfer: 'If you would make this transfer, the account balance of the account you want to transfer from would become negative. Please specify a different amount of money.'
+                },
+                edited: {
+                    transaction: 'If you would perform this transaction, the {account} account balance would become negative. Please specify a different amount of money.',
+                        // {
+                        // sameMoneyAccount: 'If you would perform this transaction, the account balance would become negative. Please specify a different amount of money.',
+                        // differentMoneyAccount: {
+                        //     oldMoneyAccountNegative: 'If you would perform this transaction, the old account balance would become negative. Please specify a different amount of money.',
+                        //     newMoneyAccountNegative: 'If you would perform this transaction, the new account balance would become negative. Please specify another amount of money.'
+                        // }
+                    //},
+                    transfer: {
+                        sameMoneyAccounts: 'Würden Sie diese Umbuchung durchführen, würde der Kontostand des Kontos, von dem Sie umbuchen wollen, negativ werden. Bitte geben Sie einen anderen Geldbetrag an.',
+                        differentFrom: {
+                            newFromNegative: 'Würden Sie diese Umbuchung durchführen, würde der Kontostand des neuen Kontos, von dem Sie umbuchen wollen, negativ werden. Bitte geben Sie einen anderen Geldbetrag oder ein anderes Konto an.'
+                        },
+                        differentTo: {
+                            oldToNegative: 'Würden Sie diese Umbuchung durchführen, würde der Kontostand des alten Kontos, auf das Sie umgebucht haben, negativ werden. Bitte geben Sie einen anderen Geldbetrag oder ein anderes Konto an.'
+                        }
+                    }
+                },
+                delete: {
+                    transaction: 'Wenn Sie diese Transaktion löschen würden, würde der Kontostand negativ werden.',
+                    transfer: 'Würden Sie diese Umbuchung löschen, würde der Kontostand des Kontos, auf das Sie umgebucht haben, negativ werden.'
+                }
+            },
         },
         moneyFormat: {
             monetaryUnit: '$',

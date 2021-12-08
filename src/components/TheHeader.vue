@@ -136,7 +136,7 @@ export default {
       localStorage.removeItem('state');
     },
     changeLanguage() {
-      this.$i18n.locale = this.selectedLangAbbreviation;
+      this.$root.$i18n.locale = this.selectedLangAbbreviation;
     }
   },
   watch: {

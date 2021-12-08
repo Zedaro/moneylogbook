@@ -4,7 +4,7 @@
     <v-dialog v-model="dialog" max-width="25%">
       <v-card>
         <v-card-title class="text-h5">
-          Fehler
+          {{ $t('form.errorMessages.title') }}
         </v-card-title>
         <v-card-text>
           {{ dialogText }}
