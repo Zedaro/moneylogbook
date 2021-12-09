@@ -265,8 +265,6 @@ export default {
 
 <style scoped>
 
-
-
 .dialog-card {
   background-color: #ff879c;
 }

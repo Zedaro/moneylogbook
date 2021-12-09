@@ -11,8 +11,7 @@ export const store = new Vuex.Store({
             let obj = {
                 languages: {
                     de: 'Deutsch',
-                    "en-US": 'English (US)',
-                    "en-GB": 'English (GB)'
+                    "en-US": 'English (US)'
                 },
                 toolbarTitle: 'Übersicht',
                 moneyAccounts: [
@@ -230,7 +229,7 @@ export const store = new Vuex.Store({
                     const newBalance = parseFloat( ( balance + (data.money - data.oldTransaction.money) ).toFixed(2) )
 
                     if(newBalance < 0) {
-                        return i18n.t('form.errorMessages.edited.transaction', { account: '' });
+                        return i18n.t('form.errorMessages.edit.transaction.sameMoneyAccount');
                     }
                     else {
                         data.newBalance = newBalance;
@@ -252,9 +251,9 @@ export const store = new Vuex.Store({
                     const newAccount_newBalance =  parseFloat( ( newAccount.money + newTransaction ).toFixed(2) );
 
                     if(oldAccount_newBalance < 0) {
-                        return "Wenn Sie diese Transaktion durchführen würden, würde der alte Kontostand negativ werden. Bitte geben Sie einen anderen Geldbetrag an.";
+                        return i18n.t('form.errorMessages.edit.transaction.differentMoneyAccount.oldMoneyAccountNegative');
                     } else if(newAccount_newBalance < 0) {
-                        return "Wenn Sie diese Transaktion durchführen würden, würde der neue Kontostand negativ werden. Bitte geben Sie einen anderen Geldbetrag oder ein anderes Konto an.";
+                        return i18n.t('form.errorMessages.edit.transaction.differentMoneyAccount.newMoneyAccountNegative');
                     } else {
                         data.oldAccount_newBalance = oldAccount_newBalance;
                         data.newAccount_newBalance = newAccount_newBalance;
@@ -274,7 +273,7 @@ export const store = new Vuex.Store({
             const newBalance = parseFloat( ( balance - data.transactionToDelete.money ).toFixed(2) )
 
             if(newBalance < 0) {
-                return "Wenn Sie diese Transaktion löschen würden, würde der Kontostand negativ werden.";
+                return i18n.t('form.errorMessages.delete.transaction');
             } else {
                 data.newBalance = newBalance;
                 context.commit('deleteTransaction', data);
@@ -322,7 +321,7 @@ export const store = new Vuex.Store({
             if(data.item === 'new') {
                 const newFromBalance = parseFloat( (data.fromAccount.money - data.money).toFixed(2) );
                 if(newFromBalance < 0) {
-                    return "Würden Sie diese Umbuchung durchführen, würde der Kontostand des Kontos, von dem Sie umbuchen wollen, negativ werden. Bitte geben Sie einen anderen Geldbetrag an.";
+                    return i18n.t('form.errorMessages.new.transfer');
                 }
                 context.commit('saveNewTransfer', data);
             }
@@ -339,7 +338,7 @@ export const store = new Vuex.Store({
                     //if newBalance would be negative, return dialog text
                     const newFromBalance = parseFloat( ( data.fromAccount.money - (newTransfer - oldTransfer) ).toFixed(2) );
                     if(newFromBalance < 0) {
-                        return "Würden Sie diese Umbuchung durchführen, würde der Kontostand des Kontos, von dem Sie umbuchen wollen, negativ werden. Bitte geben Sie einen anderen Geldbetrag an."
+                        return i18n.t('form.errorMessages.edit.transfer.sameMoneyAccounts');
                     }
                     //else saveEditedTransfer
                     context.commit('saveEditedTransfer', data);
@@ -360,13 +359,13 @@ export const store = new Vuex.Store({
                         //if newFromBalance negative, return dialog text
                         const newFromBalance = parseFloat( (data.fromAccount.money - data.money).toFixed(2) );
                         if(newFromBalance < 0) {
-                            return "Würden Sie diese Umbuchung durchführen, würde der Kontostand des neuen Kontos, von dem Sie umbuchen wollen, negativ werden. Bitte geben Sie einen anderen Geldbetrag oder ein anderes Konto an."
+                            return i18n.t('form.errorMessages.edit.transfer.differentMoneyAccounts.newFromNegative');
                         }
 
                         //if balance of the old to account would be negative, return dialog text
                         const toBalance = parseFloat( ( data.oldToAccount.money - oldTransfer ).toFixed(2) );
                         if(toBalance < 0) {
-                            return "Würden Sie diese Umbuchung durchführen, würde der Kontostand des alten Kontos, auf das Sie umgebucht haben, negativ werden. Bitte geben Sie einen anderen Geldbetrag oder ein anderes Konto an."
+                            return i18n.t('form.errorMessages.edit.transfer.differentMoneyAccounts.oldToNegative');
                         }
 
                         //if both isn't the case, saveEditedTransferWithNewFromTo
@@ -377,7 +376,7 @@ export const store = new Vuex.Store({
                         //if newFromBalance negative, return dialog text
                         const newFromBalance = parseFloat( (data.fromAccount.money - data.money).toFixed(2) );
                         if(newFromBalance < 0) {
-                            return "Würden Sie diese Umbuchung durchführen, würde der Kontostand des neuen Kontos, von dem Sie umbuchen wollen, negativ werden. Bitte geben Sie einen anderen Geldbetrag oder ein anderes Konto an."
+                            return i18n.t('form.errorMessages.edit.transfer.differentMoneyAccounts.newFromNegative');
                         }
                         //else saveEditedTransferWithNewFrom
                         context.commit('saveEditedTransferWithNewFrom', data);
@@ -388,7 +387,7 @@ export const store = new Vuex.Store({
                         //if balance of the old to account would be negative, return dialog text
                         const toBalance = parseFloat( ( data.oldToAccount.money - oldTransfer ).toFixed(2) );
                         if(toBalance < 0) {
-                            return "Würden Sie diese Umbuchung durchführen, würde der Kontostand des alten Kontos, auf das Sie umgebucht haben, negativ werden. Bitte geben Sie einen anderen Geldbetrag oder ein anderes Konto an."
+                            return i18n.t('form.errorMessages.edit.transfer.differentMoneyAccounts.oldToNegative');
                         }
                         //else saveEditedTransferWithNewTo
                         context.commit('saveEditedTransferWithNewTo', data);
@@ -411,7 +410,7 @@ export const store = new Vuex.Store({
             //if balance of the to account would get negative, return dialog text
             const toBalance = parseFloat( ( data.toAccount.money - data.transferToDelete.money ).toFixed(2) );
             if(toBalance < 0) {
-                return "Würden Sie diese Umbuchung löschen, würde der Kontostand des Kontos, auf das Sie umgebucht haben, negativ werden."
+                return i18n.t('form.errorMessages.delete.transfer');
             }
             //else deleteTransfer
             context.commit('deleteTransfer', data);

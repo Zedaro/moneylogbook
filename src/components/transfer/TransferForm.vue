@@ -1,8 +1,8 @@
 <template>
   <div>
 
-    <v-dialog v-model="dialog" max-width="25%">
-      <v-card>
+    <v-dialog v-model="dialog" content-class="dialog">
+      <v-card class="dialog-card">
         <v-card-title class="text-h5">
           {{ $t('form.errorMessages.title') }}
         </v-card-title>
@@ -387,5 +387,42 @@ export default {
 
 <style scoped>
 
+.dialog-card {
+  background-color: #ff879c;
+}
 
 </style>
+
+
+<style>
+.dialog {
+  max-width: 85%;
+}
+
+@media only screen and (min-width: 600px) {
+  .dialog {
+    max-width: 60%;
+  }
+}
+
+@media only screen and (min-width: 960px) {
+  .dialog {
+    max-width: 60%;
+  }
+}
+
+@media only screen and (min-width: 1264px) {
+  .dialog {
+    max-width: 30%;
+  }
+}
+
+@media only screen and (min-width: 1904px) {
+  .dialog {
+    max-width: 30%;
+  }
+}
+
+</style>
+
+

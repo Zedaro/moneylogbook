@@ -45,6 +45,8 @@ body {
   width: 90%;
 }
 
+
+
 @media only screen and (min-width: 600px) {
   .form-card {
     width: 75%;
